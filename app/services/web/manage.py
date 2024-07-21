@@ -1,6 +1,7 @@
 from flask.cli import FlaskGroup
 
-from project import app, db, User
+from project import app, db, Transaction
+from datetime import datetime
 
 
 cli = FlaskGroup(app)
@@ -15,7 +16,10 @@ def create_db():
 
 @cli.command("seed_db")
 def seed_db():
-    db.session.add(User(email="michael@mherman.org"))
+    transaction = Transaction(
+        amount=100.0, currency="USD", is_incoming=True, date_time=datetime.utcnow()
+    )
+    db.session.add(transaction)
     db.session.commit()
 
 
