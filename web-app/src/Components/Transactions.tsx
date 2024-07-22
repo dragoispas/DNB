@@ -20,8 +20,8 @@ const defaultTransaction: Transaction = {
 const Container = styled(Box)({
     display: "flex",
     flexDirection: "column",
-    gap: 10,
-    margin: 5,
+    gap: 50,
+    margin: 30,
 });
 
 const FormContainer = styled(Box)({
