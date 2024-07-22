@@ -13,3 +13,6 @@ Project Setup
 
 To access database:
 - docker-compose exec db psql --username=[user] --dbname=[db_name]
+
+If not running
+- Make sure entrypoint.sh is LF and not CRLF End of line sequence
