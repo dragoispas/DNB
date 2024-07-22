@@ -30,5 +30,7 @@ RUN chmod +x /usr/src/app/entrypoint.sh
 # run entrypoint.sh
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
 
+CMD ["bash"]
+
 # expose port
 EXPOSE 5001
