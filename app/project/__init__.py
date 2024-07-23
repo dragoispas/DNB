@@ -1,11 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_cors import CORS
 
 
 app = Flask(__name__)
 app.config.from_object("project.config.Config")
 db = SQLAlchemy(app)
+CORS(app, origins=["http://localhost:3000"])
 
 
 class Transaction(db.Model):
@@ -58,7 +60,7 @@ def add_transaction():
     is_incoming = data.get("is_incoming")
     date_time = data.get("date_time", datetime.utcnow())
 
-    if not all([amount, currency, is_incoming]):
+    if amount is None or currency is None or is_incoming is None:
         return jsonify({"error": "Missing required fields"}), 400
 
     transaction = Transaction(
