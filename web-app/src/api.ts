@@ -21,6 +21,7 @@ export const getTransactions = async (): Promise<Transaction[]> => {
 };
 
 export const addTransaction = async (transaction: Transaction): Promise<Transaction> => {
+    console.log(transaction)
     try {
         const response = await axios.post<Transaction>(`${API_BASE_URL}/transactions`, transaction);
         return response.data;

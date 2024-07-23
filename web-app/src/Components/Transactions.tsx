@@ -49,10 +49,11 @@ const Transactions: React.FC = () => {
         fetchTransactions();
     }, []);
 
-    const handleInputChange = (field: keyof Transaction) => (event: ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
         setNewTransaction(prevState => ({
             ...prevState,
-            [field]: field === 'amount' ? parseFloat(event.target.value) : event.target.value
+            [field]: field === 'is_incoming' ? value === 'Incoming' : value
         }));
     };
 
