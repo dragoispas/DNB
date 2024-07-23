@@ -18,8 +18,9 @@ const TransactionsTable: React.FC<Props> = ({ transactions }) => {
                         <TableCell>Transaction</TableCell>
                         <TableCell align="right">Amount</TableCell>
                         <TableCell align="right">Currency</TableCell>
-                        <TableCell align="right">Transaction Type</TableCell>
                         <TableCell align="right">Date Time</TableCell>
+                        <TableCell align="right">Sender ID</TableCell>
+                        <TableCell align="right">Receiver ID</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -28,8 +29,9 @@ const TransactionsTable: React.FC<Props> = ({ transactions }) => {
                             <TableCell component="th" scope="row">{row.id}</TableCell>
                             <TableCell align="right">{row.amount}</TableCell>
                             <TableCell align="right">{row.currency}</TableCell>
-                            <TableCell align="right">{row.is_incoming ? "Incoming" : "Outgoing"}</TableCell>
                             <TableCell align="right">{row.date_time}</TableCell>
+                            <TableCell align="right">{row.sender_id}</TableCell>
+                            <TableCell align="right">{row.receiver_id}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from datetime import datetime
+from datetime import datetime, timezone
 from project.models import db, Transaction
 
 transaction_bp = Blueprint("transactions", __name__)
@@ -13,8 +13,9 @@ def get_transactions():
             "id": transaction.id,
             "amount": transaction.amount,
             "currency": transaction.currency,
-            "is_incoming": transaction.is_incoming,
             "date_time": transaction.date_time,
+            "sender_id": transaction.sender_id,
+            "receiver_id": transaction.receiver_id,
         }
         for transaction in transactions
     ]
@@ -26,20 +27,22 @@ def add_transaction():
     data = request.get_json()
     amount = data.get("amount")
     currency = data.get("currency")
-    is_incoming = data.get("is_incoming")
-    date_time = data.get("date_time", datetime.utcnow())
+    sender_id = data.get("sender_id")
+    receiver_id = data.get("receiver_id")
+    date_time = data.get("date_time")
 
-    if amount is None or currency is None or is_incoming is None:
+    if amount is None or currency is None or sender_id is None or receiver_id is None:
         return jsonify({"error": "Missing required fields"}), 400
 
     transaction = Transaction(
         amount=amount,
         currency=currency,
-        is_incoming=is_incoming,
+        sender_id=sender_id,
+        receiver_id=receiver_id,
         date_time=(
-            datetime.fromisoformat(date_time)
+            datetime.fromisoformat(date_time).replace(tzinfo=timezone.utc)
             if isinstance(date_time, str)
-            else date_time
+            else datetime.now(timezone.utc)
         ),
     )
     db.session.add(transaction)
@@ -53,8 +56,9 @@ def add_transaction():
                     "id": transaction.id,
                     "amount": transaction.amount,
                     "currency": transaction.currency,
-                    "is_incoming": transaction.is_incoming,
                     "date_time": transaction.date_time,
+                    "sender_id": transaction.sender_id,
+                    "receiver_id": transaction.receiver_id,
                 },
             }
         ),

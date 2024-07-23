@@ -13,8 +13,9 @@ const currencies = [
 const defaultTransaction: Transaction = {
     amount: 0,
     currency: 'EUR',
-    is_incoming: true,
-    date_time: ''
+    date_time: '',
+    sender_id: 0,
+    receiver_id: 0
 };
 
 const Container = styled(Box)({
@@ -50,10 +51,9 @@ const Transactions: React.FC = () => {
     }, []);
 
     const handleInputChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
         setNewTransaction(prevState => ({
             ...prevState,
-            [field]: field === 'is_incoming' ? value === 'Incoming' : value
+            [field]: event.target.value
         }));
     };
 
@@ -95,16 +95,21 @@ const Transactions: React.FC = () => {
                     ))}
                 </TextField>
                 <TextField
-                    onChange={handleInputChange('is_incoming')}
-                    value={newTransaction.is_incoming ? "Incoming" : "Outgoing"}
-                    select
+                    onChange={handleInputChange('sender_id')}
+                    value={newTransaction.sender_id}
                     size="small"
-                    helperText="Transaction Type"
+                    helperText="Sender ID"
+                    type="number"
                     variant="standard"
-                >
-                    <MenuItem value="Incoming">Incoming</MenuItem>
-                    <MenuItem value="Outgoing">Outgoing</MenuItem>
-                </TextField>
+                />
+                <TextField
+                    onChange={handleInputChange('receiver_id')}
+                    value={newTransaction.receiver_id}
+                    size="small"
+                    helperText="Receiver ID"
+                    type="number"
+                    variant="standard"
+                />
                 <Button onClick={submitForm} variant="contained">Submit</Button>
             </FormContainer>
         </Container>
