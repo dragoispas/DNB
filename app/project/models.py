@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask import request
+
 
 db = SQLAlchemy()
 
@@ -23,3 +25,23 @@ class Transaction(db.Model):
 
     def __repr__(self):
         return f"<Transaction {self.id}: {self.amount} {self.currency} {'incoming' if self.is_incoming else 'outgoing'} on {self.date_time}>"
+
+
+    @staticmethod
+    def get():
+        currency = request.args.get('currency')
+        is_incoming = request.args.get('is_incoming')
+        amount = request.args.get('amount')
+        min_amount = 300
+
+        transaction_query = Transaction.query
+
+        if currency:
+            transaction_query = transaction_query.filter_by(currency=currency)
+        if is_incoming:
+            transaction_query = transaction_query.filter_by(is_incoming=is_incoming)
+        if amount:
+            transaction_query = transaction_query.filter(Transaction.amount >= min_amount)
+
+        transaction_query = transaction_query.all()
+        return transaction_query

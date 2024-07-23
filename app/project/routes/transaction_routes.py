@@ -2,12 +2,15 @@ from flask import Blueprint, jsonify, request
 from datetime import datetime
 from project.models import db, Transaction
 
+
 transaction_bp = Blueprint("transactions", __name__)
 
 
 @transaction_bp.route("/transactions", methods=["GET"])
 def get_transactions():
-    transactions = Transaction.query.all()
+
+    transactions = Transaction.get()
+
     result = [
         {
             "id": transaction.id,
