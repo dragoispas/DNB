@@ -1,9 +1,11 @@
 from flask.cli import FlaskGroup
 
-from project import app, db, Transaction
+from project import create_app, db
+from project.models import Transaction
 from datetime import datetime
 
 
+app = create_app()
 cli = FlaskGroup(app)
 
 
