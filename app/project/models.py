@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 
+from sqlalchemy import or_
+
 db = SQLAlchemy()
 
 
@@ -61,6 +63,7 @@ class Transaction(db.Model):
         currency=None,
         sender_id=None,
         receiver_id=None,
+        user_id=None,
         start_date=None,
         end_date=None,
         min_amount=None,
@@ -72,6 +75,12 @@ class Transaction(db.Model):
             query = query.filter_by(sender_id=sender_id)
         if receiver_id:
             query = query.filter_by(receiver_id=receiver_id)
+        if user_id:
+            query = query.filter(
+                or_(
+                    Transaction.sender_id == user_id, Transaction.receiver_id == user_id
+                )
+            )
         if start_date:
             start_date = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc)
             query = query.filter(Transaction.date_time >= start_date)
