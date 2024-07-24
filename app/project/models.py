@@ -55,3 +55,30 @@ class Transaction(db.Model):
 
     def __repr__(self):
         return f"<Transaction {self.id}: {self.amount} {self.currency} from {self.sender_id} to {self.receiver_id} on {self.date_time}>"
+
+    @staticmethod
+    def filter_transactions(
+        currency=None,
+        sender_id=None,
+        receiver_id=None,
+        start_date=None,
+        end_date=None,
+        min_amount=None,
+    ):
+        query = Transaction.query
+        if currency:
+            query = query.filter_by(currency=currency)
+        if sender_id:
+            query = query.filter_by(sender_id=sender_id)
+        if receiver_id:
+            query = query.filter_by(receiver_id=receiver_id)
+        if start_date:
+            start_date = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc)
+            query = query.filter(Transaction.date_time >= start_date)
+        if end_date:
+            end_date = datetime.fromisoformat(end_date).replace(tzinfo=timezone.utc)
+            query = query.filter(Transaction.date_time <= end_date)
+        if min_amount:
+            query = query.filter(Transaction.amount >= float(min_amount))
+
+        return query.all()

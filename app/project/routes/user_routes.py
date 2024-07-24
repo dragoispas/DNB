@@ -11,9 +11,6 @@ def get_users():
         {
             "id": user.id,
             "name": user.name,
-            "gender": user.gender,
-            "email": user.email,
-            "birth_date": user.birth_date,
         }
         for user in users
     ]

@@ -19,14 +19,39 @@ def create_db():
 @cli.command("seed_db")
 def seed_db():
     # Create a sample transaction
-    transaction = Transaction(
-        amount=100.0,
-        currency="USD",
-        date_time=datetime.now(timezone.utc),
-        sender_id=1,
-        receiver_id=2,
-    )
-    db.session.add(transaction)
+    transactions = [
+        Transaction(
+            amount=100.0,
+            currency="USD",
+            date_time=datetime(2021, 1, 1, 10, 0, 0, tzinfo=timezone.utc),
+            sender_id=1,
+            receiver_id=2,
+        ),
+        Transaction(
+            amount=200.0,
+            currency="USD",
+            date_time=datetime(2021, 2, 1, 11, 30, 0, tzinfo=timezone.utc),
+            sender_id=2,
+            receiver_id=1,
+        ),
+        Transaction(
+            amount=300.0,
+            currency="EUR",
+            date_time=datetime(2021, 3, 1, 9, 15, 0, tzinfo=timezone.utc),
+            sender_id=3,
+            receiver_id=1,
+        ),
+        Transaction(
+            amount=400.0,
+            currency="USD",
+            date_time=datetime(2021, 4, 1, 14, 45, 0, tzinfo=timezone.utc),
+            sender_id=4,
+            receiver_id=2,
+        ),
+    ]
+
+    for transaction in transactions:
+        db.session.add(transaction)
     db.session.commit()
 
 

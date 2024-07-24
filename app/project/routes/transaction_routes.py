@@ -7,7 +7,24 @@ transaction_bp = Blueprint("transactions", __name__)
 
 @transaction_bp.route("/transactions", methods=["GET"])
 def get_transactions():
-    transactions = Transaction.query.all()
+
+    currency = request.args.get("currency")
+    sender_id = request.args.get("sender_id")
+    receiver_id = request.args.get("receiver_id")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+    min_amount = request.args.get("min_amount")
+
+    transactions = Transaction.filter_transactions(
+        currency=currency,
+        sender_id=sender_id,
+        receiver_id=receiver_id,
+        start_date=start_date,
+        end_date=end_date,
+        min_amount=min_amount,
+    )
+
+    # transactions = Transaction.query.all()
     result = [
         {
             "id": transaction.id,
