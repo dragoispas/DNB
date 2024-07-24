@@ -1,7 +1,10 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Transaction, getTransactions, addTransaction } from '../api';
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, TextField, MenuItem, Button, makeStyles, styled } from '@mui/material';
+import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId } from '../api';
+import { Box, TextField, MenuItem, styled } from '@mui/material';
 import TransactionsTable from './TransactionsTable';
+import UserAvatar from './UserAvatar';
+import UserTransactionsTable from './UserTransactionsTable';
+import TransactionForm from './TransactionForm';
 
 const currencies = [
     { value: 'USD', label: '$' },
@@ -25,30 +28,45 @@ const Container = styled(Box)({
     margin: 30,
 });
 
-const FormContainer = styled(Box)({
-    display: "flex",
-    flexDirection: "row",
-    gap: 2,
-    justifyContent: "center",
-    alignItems: "center",
-});
-
 const Transactions: React.FC = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [newTransaction, setNewTransaction] = useState<Transaction>(defaultTransaction);
+    const [activeUser, setActiveUser] = useState<User>()
 
     const fetchTransactions = async () => {
         try {
-            const data = await getTransactions();
+            const data = activeUser && activeUser.id ? await getTransactionsByUserId(activeUser.id!) : await getTransactions();
             setTransactions(data);
         } catch (error) {
             console.error("Error fetching transactions:", error);
         }
     };
 
+    const fetchUsers = async () => {
+        try {
+            const data = await getUsers();
+            setUsers(data);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    };
+
     useEffect(() => {
         fetchTransactions();
+        fetchUsers();
+        setActiveUser(users[2]);
     }, []);
+
+    useEffect(() => {
+        if (activeUser && activeUser.id) {
+            setNewTransaction(prevState => ({
+                ...prevState,
+                sender_id: activeUser.id!
+            }));
+        }
+        fetchTransactions();
+    }, [activeUser])
 
     const handleInputChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
         setNewTransaction(prevState => ({
@@ -68,50 +86,37 @@ const Transactions: React.FC = () => {
         }
     };
 
+    const handleUserChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const id = parseInt(event.target.value);
+        setActiveUser(users.find(user => user.id === id))
+    }
+
     return (
         <Container>
-            <TransactionsTable transactions={transactions} />
-            <FormContainer>
-                <TextField
-                    onChange={handleInputChange('amount')}
-                    value={newTransaction.amount}
-                    size="small"
-                    helperText="Amount"
-                    type="number"
-                    variant="standard"
-                />
-                <TextField
-                    onChange={handleInputChange('currency')}
-                    value={newTransaction.currency}
-                    select
-                    size="small"
-                    helperText="Currency"
-                    variant="standard"
-                >
-                    {currencies.map(option => (
-                        <MenuItem key={option.value} value={option.value}>
-                            {option.label}
-                        </MenuItem>
-                    ))}
-                </TextField>
-                <TextField
-                    onChange={handleInputChange('sender_id')}
-                    value={newTransaction.sender_id}
-                    size="small"
-                    helperText="Sender ID"
-                    type="number"
-                    variant="standard"
-                />
-                <TextField
-                    onChange={handleInputChange('receiver_id')}
-                    value={newTransaction.receiver_id}
-                    size="small"
-                    helperText="Receiver ID"
-                    type="number"
-                    variant="standard"
-                />
-                <Button onClick={submitForm} variant="contained">Submit</Button>
-            </FormContainer>
+            {activeUser ? <UserAvatar name={activeUser.name}></UserAvatar> : null}
+            {activeUser ? <UserTransactionsTable transactions={transactions} userId={activeUser.id!} /> : <TransactionsTable transactions={transactions} />}
+            <TransactionForm
+                newTransaction={newTransaction}
+                users={users}
+                activeUser={activeUser}
+                currencies={currencies}
+                onInputChange={handleInputChange}
+                onSubmit={submitForm}
+            />
+            <TextField
+                onChange={handleUserChange}
+                value={activeUser?.name}
+                select
+                size="small"
+                helperText="Sender"
+                variant="standard"
+            >
+                {users.map(user => (
+                    <MenuItem key={user.id} value={user.id}>
+                        {user.name}
+                    </MenuItem>
+                ))}
+            </TextField>
         </Container>
     );
 };
