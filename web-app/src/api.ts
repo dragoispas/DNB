@@ -12,8 +12,9 @@ export interface Transaction {
 }
 
 export interface User {
-    id?: number;
+    id: number;
     name: string;
+    balance: number;
     gender?: string;
     email?: string;
     birth_date?: string;
@@ -61,6 +62,7 @@ export const getUsers = async (): Promise<User[]> => {
     }
 }
 
+// This gets all the fields for the user
 export const getUser = async (id: string): Promise<User> => {
     try {
         const response = await axios.get<User>(`${API_BASE_URL}/users/${id}`);

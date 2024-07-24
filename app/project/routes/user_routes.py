@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from project.models import db, User
+from project.models import Transaction, db, User
 
 user_bp = Blueprint("users", __name__)
 
@@ -20,12 +20,23 @@ def get_users():
 @user_bp.route("/users/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     user = User.query.get_or_404(user_id)
+
+    # Calculate user's balance
+    transactions = Transaction.filter_transactions(user_id=user_id)
+    balance = 0
+    for transaction in transactions:
+        if transaction.receiver_id == user_id:
+            balance += transaction.amount
+        elif transaction.sender_id == user_id:
+            balance -= transaction.amount
+
     result = {
         "id": user.id,
         "name": user.name,
         "gender": user.gender,
         "email": user.email,
         "birth_date": user.birth_date,
+        "balance": balance,  # Include the calculated balance
     }
     return jsonify(result)
 

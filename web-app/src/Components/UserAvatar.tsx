@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar, Typography, Box } from '@mui/material';
+import { User } from '../api';
 
 // Utility function to generate a random color
 const getRandomColor = () => {
@@ -19,11 +20,11 @@ const getInitials = (name: string) => {
 };
 
 interface Props {
-    name: string;
+    user: User;
 }
 
-const UserAvatar: React.FC<Props> = ({ name }) => {
-    const initials = getInitials(name);
+const UserAvatar: React.FC<Props> = ({ user }) => {
+    const initials = getInitials(user.name);
     const avatarColor = getRandomColor();
 
     return (
@@ -32,7 +33,7 @@ const UserAvatar: React.FC<Props> = ({ name }) => {
                 {initials}
             </Avatar>
             <Typography variant="h6" sx={{ marginLeft: 2 }}>
-                {name}
+                {user.name}
             </Typography>
         </Box>
     );

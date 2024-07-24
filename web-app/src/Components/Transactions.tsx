@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId } from '../api';
-import { Box, TextField, MenuItem, styled } from '@mui/material';
+import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId, getUser } from '../api';
+import { Box, TextField, MenuItem, styled, Typography } from '@mui/material';
 import TransactionsTable from './TransactionsTable';
 import UserAvatar from './UserAvatar';
 import UserTransactionsTable from './UserTransactionsTable';
@@ -33,6 +33,7 @@ const Transactions: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [newTransaction, setNewTransaction] = useState<Transaction>(defaultTransaction);
     const [activeUser, setActiveUser] = useState<User>()
+    const [activeUserDetailed, setActiveUserDetailed] = useState<User>()
 
     const fetchTransactions = async () => {
         try {
@@ -52,10 +53,19 @@ const Transactions: React.FC = () => {
         }
     };
 
+    const fetchUserDetailed = async () => {
+        if (!activeUser) return;
+        try {
+            const data = await getUser(activeUser.id.toString());
+            setActiveUserDetailed(data);
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+        }
+    };
+
     useEffect(() => {
         fetchTransactions();
         fetchUsers();
-        setActiveUser(users[2]);
     }, []);
 
     useEffect(() => {
@@ -64,6 +74,7 @@ const Transactions: React.FC = () => {
                 ...prevState,
                 sender_id: activeUser.id!
             }));
+            fetchUserDetailed()
         }
         fetchTransactions();
     }, [activeUser])
@@ -80,6 +91,9 @@ const Transactions: React.FC = () => {
             const transactionToSubmit = { ...newTransaction, date_time: new Date().toISOString() };
             await addTransaction(transactionToSubmit);
             await fetchTransactions();
+            if (activeUser) {
+                await fetchUserDetailed();
+            }
             setNewTransaction(defaultTransaction);  // Reset the form
         } catch (error) {
             console.error("Error adding transaction:", error);
@@ -93,7 +107,8 @@ const Transactions: React.FC = () => {
 
     return (
         <Container>
-            {activeUser ? <UserAvatar name={activeUser.name}></UserAvatar> : null}
+            {activeUser ? <UserAvatar user={activeUser}></UserAvatar> : null}
+            {activeUserDetailed ? <Typography >{`Account Balance: ${activeUserDetailed.balance} EUR`}</Typography> : null}
             {activeUser ? <UserTransactionsTable transactions={transactions} userId={activeUser.id!} /> : <TransactionsTable transactions={transactions} />}
             <TransactionForm
                 newTransaction={newTransaction}

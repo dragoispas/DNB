@@ -16,7 +16,7 @@ const UserTransactionsTable: React.FC<Props> = ({ transactions, userId }) => {
             <StyledTable>
                 <TableHead>
                     <TableRow>
-                        <TableCell>Transaction</TableCell>
+                        <TableCell>Transaction ID</TableCell>
                         <TableCell align="right">Amount</TableCell>
                         <TableCell align="right">Currency</TableCell>
                         <TableCell align="right">Transaction Type</TableCell>
