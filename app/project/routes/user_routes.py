@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
+from sqlalchemy import case, func
 from project.models import Transaction, db, User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -50,16 +51,23 @@ def profile():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    # Calculate user's balance
-    transactions = Transaction.filter_transactions(user_id=user.id)
-    balance = sum(
-        (
-            transaction.amount
-            if transaction.receiver_id == user.id
-            else -transaction.amount
+    # Calculate user's balance using database query
+    balance = (
+        db.session.query(
+            func.sum(
+                case(
+                    (Transaction.receiver_id == user.id, Transaction.amount),
+                    (Transaction.sender_id == user.id, -Transaction.amount),
+                )
+            )
         )
-        for transaction in transactions
+        .filter(
+            (Transaction.sender_id == user.id) | (Transaction.receiver_id == user.id)
+        )
+        .scalar()
     )
+
+    balance = balance or 0  # Handle None case when no transactions are found
 
     result = {
         "id": user.id,
