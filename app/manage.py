@@ -1,8 +1,9 @@
+import random
 from flask.cli import FlaskGroup
 
 from project import create_app, db
 from project.models import Transaction, User
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 
 app = create_app()
@@ -16,43 +17,35 @@ def create_db():
     db.session.commit()
 
 
-@cli.command("seed_db")
-def seed_db():
-    # Create a sample transaction
-    transactions = [
-        Transaction(
-            amount=100.0,
-            currency="EUR",
-            date_time=datetime(2021, 1, 1, 10, 0, 0, tzinfo=timezone.utc),
-            sender_id=1,
-            receiver_id=2,
-        ),
-        Transaction(
-            amount=200.0,
-            currency="EUR",
-            date_time=datetime(2021, 2, 1, 11, 30, 0, tzinfo=timezone.utc),
-            sender_id=2,
-            receiver_id=1,
-        ),
-        Transaction(
-            amount=300.0,
-            currency="EUR",
-            date_time=datetime(2021, 3, 1, 9, 15, 0, tzinfo=timezone.utc),
-            sender_id=3,
-            receiver_id=1,
-        ),
-        Transaction(
-            amount=400.0,
-            currency="EUR",
-            date_time=datetime(2021, 4, 1, 14, 45, 0, tzinfo=timezone.utc),
-            sender_id=3,
-            receiver_id=2,
-        ),
-    ]
+@cli.command("seed_transactions")
+def seed_transactions():
+    # Get the list of user IDs from the User model
+    users = User.query.all()
+    user_ids = [user.id for user in users]
 
-    for transaction in transactions:
-        db.session.add(transaction)
+    # Generate transactions
+    transactions = []
+    start_date = datetime(2021, 1, 1, tzinfo=timezone.utc)
+    for i in range(10000):  # Number of transactions to seed
+        amount = random.uniform(10.0, 1000.0)
+        currency = "EUR"
+        date_time = start_date + timedelta(days=random.randint(0, 365))
+        sender_id = random.choice(user_ids)
+        receiver_id = random.choice([uid for uid in user_ids if uid != sender_id])
+
+        transaction = Transaction(
+            amount=amount,
+            currency=currency,
+            date_time=date_time,
+            sender_id=sender_id,
+            receiver_id=receiver_id,
+        )
+        transactions.append(transaction)
+
+    # Bulk insert all transactions
+    db.session.bulk_save_objects(transactions)
     db.session.commit()
+    print(f"Seeded {len(transactions)} transactions.")
 
 
 @cli.command("seed_users")
