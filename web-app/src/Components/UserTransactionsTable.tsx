@@ -6,10 +6,11 @@ const StyledTable = styled(Table)({
 });
 
 interface Props {
-    transactions: Transaction[]
+    transactions: Transaction[];
+    userId: number;
 }
 
-const TransactionsTable: React.FC<Props> = ({ transactions }) => {
+const UserTransactionsTable: React.FC<Props> = ({ transactions, userId }) => {
     return (
         <TableContainer component={Paper}>
             <StyledTable>
@@ -18,9 +19,9 @@ const TransactionsTable: React.FC<Props> = ({ transactions }) => {
                         <TableCell>Transaction ID</TableCell>
                         <TableCell align="right">Amount</TableCell>
                         <TableCell align="right">Currency</TableCell>
+                        <TableCell align="right">Transaction Type</TableCell>
                         <TableCell align="right">Date Time</TableCell>
-                        <TableCell align="right">Sender ID</TableCell>
-                        <TableCell align="right">Receiver ID</TableCell>
+                        <TableCell align="right">Collaborator ID</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -29,15 +30,19 @@ const TransactionsTable: React.FC<Props> = ({ transactions }) => {
                             <TableCell component="th" scope="row">{row.id}</TableCell>
                             <TableCell align="right">{row.amount}</TableCell>
                             <TableCell align="right">{row.currency}</TableCell>
+                            <TableCell align="right">
+                                {userId === row.sender_id ? "Credited" : "Debited"}
+                            </TableCell>
                             <TableCell align="right">{row.date_time}</TableCell>
-                            <TableCell align="right">{row.sender_id}</TableCell>
-                            <TableCell align="right">{row.receiver_id}</TableCell>
+                            <TableCell align="right">
+                                {userId === row.sender_id ? row.receiver_id : row.sender_id}
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </StyledTable>
         </TableContainer>
-    )
-}
+    );
+};
 
-export default TransactionsTable;
+export default UserTransactionsTable;

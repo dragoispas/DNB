@@ -1,11 +1,12 @@
 import React from 'react';
-import logo from './logo.svg';
-import Transactions from './Components/Transactions';
+import AppRouter from './AppRouter';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <Transactions></Transactions>
+    <div className="App">
+      <AppRouter />
+    </div>
   );
-}
+};
 
 export default App;
