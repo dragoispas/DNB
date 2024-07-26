@@ -1,5 +1,8 @@
+from flask_jwt_extended import decode_token
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from sqlalchemy import or_
 
@@ -14,12 +17,20 @@ class User(db.Model):
     gender = db.Column(db.String(10), nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
     birth_date = db.Column(db.Date, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, name, gender, email, birth_date):
+    def __init__(self, name, gender, email, birth_date, password):
         self.name = name
         self.gender = gender
         self.email = email
         self.birth_date = birth_date
+        self.set_password(password)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
         return f"<User {self.id}: {self.name}, {self.gender}, {self.email}, {self.birth_date}>"

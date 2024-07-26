@@ -1,6 +1,7 @@
 import React from 'react';
 import { Avatar, Typography, Box } from '@mui/material';
 import { User } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 // Utility function to generate a random color
 const getRandomColor = () => {
@@ -26,10 +27,15 @@ interface Props {
 const UserAvatar: React.FC<Props> = ({ user }) => {
     const initials = getInitials(user.name);
     const avatarColor = getRandomColor();
+    const navigate = useNavigate();
+
+    const handleOnClick = () => {
+        navigate('/profile');
+    }
 
     return (
         <Box display="flex" alignItems="center">
-            <Avatar sx={{ bgcolor: avatarColor }}>
+            <Avatar sx={{ bgcolor: avatarColor, cursor: "pointer" }} onClick={handleOnClick}>
                 {initials}
             </Avatar>
             <Typography variant="h6" sx={{ marginLeft: 2 }}>
