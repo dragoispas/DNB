@@ -22,14 +22,14 @@ def seed_db():
     transactions = [
         Transaction(
             amount=100.0,
-            currency="USD",
+            currency="EUR",
             date_time=datetime(2021, 1, 1, 10, 0, 0, tzinfo=timezone.utc),
             sender_id=1,
             receiver_id=2,
         ),
         Transaction(
             amount=200.0,
-            currency="USD",
+            currency="EUR",
             date_time=datetime(2021, 2, 1, 11, 30, 0, tzinfo=timezone.utc),
             sender_id=2,
             receiver_id=1,
@@ -43,9 +43,9 @@ def seed_db():
         ),
         Transaction(
             amount=400.0,
-            currency="USD",
+            currency="EUR",
             date_time=datetime(2021, 4, 1, 14, 45, 0, tzinfo=timezone.utc),
-            sender_id=4,
+            sender_id=3,
             receiver_id=2,
         ),
     ]
@@ -58,39 +58,37 @@ def seed_db():
 @cli.command("seed_users")
 def seed_users():
     users = [
-        User(
-            name="Alice",
-            gender="Female",
-            email="alice@example.com",
-            birth_date=datetime(1990, 1, 1),
-        ),
-        User(
-            name="Bob",
-            gender="Male",
-            email="bob@example.com",
-            birth_date=datetime(1985, 5, 15),
-        ),
-        User(
-            name="Charlie",
-            gender="Male",
-            email="charlie@example.com",
-            birth_date=datetime(1992, 8, 20),
-        ),
-        User(
-            name="Diana",
-            gender="Female",
-            email="diana@example.com",
-            birth_date=datetime(1988, 3, 10),
-        ),
-        User(
-            name="Eve",
-            gender="Female",
-            email="eve@example.com",
-            birth_date=datetime(1995, 12, 5),
-        ),
+        {
+            "name": "Alice",
+            "gender": "Female",
+            "email": "alice@example.com",
+            "birth_date": "1985-01-01",
+            "password": "pass",
+        },
+        {
+            "name": "Bob",
+            "gender": "Male",
+            "email": "bob@example.com",
+            "birth_date": "1990-02-02",
+            "password": "pass",
+        },
+        {
+            "name": "Charlie",
+            "gender": "Non-binary",
+            "email": "charlie@example.com",
+            "birth_date": "1995-03-03",
+            "password": "pass",
+        },
     ]
 
-    for user in users:
+    for user_data in users:
+        user = User(
+            name=user_data["name"],
+            gender=user_data["gender"],
+            email=user_data["email"],
+            birth_date=user_data["birth_date"],
+            password=user_data["password"],
+        )
         db.session.add(user)
     db.session.commit()
 
