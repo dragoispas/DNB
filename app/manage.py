@@ -27,7 +27,7 @@ def seed_transactions():
     transactions = []
     start_date = datetime(2021, 1, 1, tzinfo=timezone.utc)
     for i in range(10000):  # Number of transactions to seed
-        amount = random.uniform(10.0, 1000.0)
+        amount = random.randint(10, 1000)
         currency = "EUR"
         date_time = start_date + timedelta(days=random.randint(0, 365))
         sender_id = random.choice(user_ids)
