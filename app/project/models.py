@@ -101,4 +101,4 @@ class Transaction(db.Model):
         if min_amount:
             query = query.filter(Transaction.amount >= float(min_amount))
 
-        return query.all()
+        return query

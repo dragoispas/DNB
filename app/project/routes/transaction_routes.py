@@ -5,9 +5,14 @@ from project.models import db, Transaction
 transaction_bp = Blueprint("transactions", __name__)
 
 
+from flask import Blueprint, jsonify, request
+from project.models import db, Transaction
+
+transaction_bp = Blueprint("transactions", __name__)
+
+
 @transaction_bp.route("/transactions", methods=["GET"])
 def get_transactions():
-
     currency = request.args.get("currency")
     sender_id = request.args.get("sender_id")
     receiver_id = request.args.get("receiver_id")
@@ -15,8 +20,11 @@ def get_transactions():
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
     min_amount = request.args.get("min_amount")
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
-    transactions = Transaction.filter_transactions(
+    # Use the filter_transactions method to get the filtered query
+    transactions_query = Transaction.filter_transactions(
         currency=currency,
         sender_id=sender_id,
         receiver_id=receiver_id,
@@ -26,7 +34,11 @@ def get_transactions():
         min_amount=min_amount,
     )
 
-    # transactions = Transaction.query.all()
+    # Apply pagination
+    pagination = transactions_query.paginate(page=page, per_page=per_page)
+    transactions = pagination.items
+
+    # Format the result
     result = [
         {
             "id": transaction.id,
@@ -38,7 +50,17 @@ def get_transactions():
         }
         for transaction in transactions
     ]
-    return jsonify(result)
+
+    # Include pagination info in the response
+    return jsonify(
+        {
+            "total_pages": pagination.pages,
+            "total_items": pagination.total,
+            "current_page": page,
+            "per_page": per_page,
+            "transactions": result,
+        }
+    )
 
 
 @transaction_bp.route("/transactions", methods=["POST"])

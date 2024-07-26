@@ -11,6 +11,14 @@ export interface Transaction {
     receiver_id: number;
 }
 
+export interface TransactionsResponse {
+    total_pages: number;
+    total_items: number;
+    current_page: number;
+    per_page: number;
+    transactions: Transaction[];
+}
+
 export interface User {
     id: number;
     name: string;
@@ -44,9 +52,11 @@ export interface RegisterResponse {
     message?: string;
 }
 
-export const getTransactions = async (): Promise<Transaction[]> => {
+export const getTransactions = async (page: number = 1, per_page: number = 10): Promise<TransactionsResponse> => {
     try {
-        const response = await axios.get<Transaction[]>(`${API_BASE_URL}/transactions`);
+        const response = await axios.get<TransactionsResponse>(`${API_BASE_URL}/transactions`, {
+            params: { page, per_page }
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching transactions:", error);
@@ -54,10 +64,10 @@ export const getTransactions = async (): Promise<Transaction[]> => {
     }
 };
 
-export const getTransactionsByUserId = async (userId: number): Promise<Transaction[]> => {
+export const getTransactionsByUserId = async (userId: number, page: number = 1, per_page: number = 10): Promise<TransactionsResponse> => {
     try {
-        const response = await axios.get<Transaction[]>(`${API_BASE_URL}/transactions`, {
-            params: { user_id: userId }
+        const response = await axios.get<TransactionsResponse>(`${API_BASE_URL}/transactions`, {
+            params: { user_id: userId, page, per_page }
         });
         return response.data;
     } catch (error) {
