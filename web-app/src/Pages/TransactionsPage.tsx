@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId, getUser, getProfile } from '../api';
-import { Box, TextField, MenuItem, styled, Typography } from '@mui/material';
+import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId, getUser, getProfile, TransactionsResponse } from '../api';
+import { Box, TextField, MenuItem, styled, Typography, Pagination } from '@mui/material';
 import TransactionForm from '../Components/TransactionForm';
 import TransactionsTable from '../Components/TransactionsTable';
 import UserAvatar from '../Components/UserAvatar';
@@ -34,14 +34,29 @@ const Transactions: React.FC = () => {
     const [newTransaction, setNewTransaction] = useState<Transaction>(defaultTransaction);
     const [profile, setProfile] = useState<User>()
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const perPage = 10; // Number of transactions per page
+
     const fetchTransactions = async () => {
         try {
-            const data = profile && profile.id ? await getTransactionsByUserId(profile.id!) : await getTransactions();
-            setTransactions(data);
+            let data: TransactionsResponse;
+            if (profile && profile.id) {
+                data = await getTransactionsByUserId(profile.id, currentPage, perPage);
+            } else {
+                data = await getTransactions(currentPage, perPage);
+            }
+            setTransactions(data.transactions);
+            setTotalPages(data.total_pages);
         } catch (error) {
             console.error("Error fetching transactions:", error);
         }
     };
+
+    useEffect(() => {
+        fetchTransactions();
+    }, [currentPage])
+
 
     const fetchUsers = async () => {
         try {
@@ -92,11 +107,16 @@ const Transactions: React.FC = () => {
         }
     };
 
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setCurrentPage(value);
+    };
+
     return (
         <Container>
             {profile ? <UserAvatar user={profile}></UserAvatar> : null}
             {profile ? <Typography >{`Account Balance: ${profile.balance} EUR`}</Typography> : null}
             {profile ? <UserTransactionsTable transactions={transactions} userId={profile.id!} /> : null}
+            <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
             <TransactionForm
                 newTransaction={newTransaction}
                 users={users}
