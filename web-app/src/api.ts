@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5001'; // Update this to your Flask server URL if needed
+export const API_BASE_URL = 'http://localhost:5001'; // Update this to your Flask server URL if needed
 
 export interface Transaction {
     id?: number;

@@ -1,5 +1,8 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId, getUser, getProfile, TransactionsResponse } from '../api';
+import React, { useEffect, ChangeEvent } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTransactions, fetchTransactionsByUser, createTransaction } from '../actions/transactionActions';
+import { fetchUsers, fetchProfile } from '../actions/userActions';
+import { RootState, AppDispatch } from '../store';
 import { Box, TextField, MenuItem, styled, Typography } from '@mui/material';
 import TransactionForm from '../Components/TransactionForm';
 import UserAvatar from '../Components/UserAvatar';
@@ -12,7 +15,7 @@ const currencies = [
     { value: 'JPY', label: '¥' },
 ];
 
-const defaultTransaction: Transaction = {
+const defaultTransaction = {
     amount: 0,
     currency: 'EUR',
     date_time: '',
@@ -28,60 +31,29 @@ const Container = styled(Box)({
 });
 
 const Transactions: React.FC = () => {
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
-    const [newTransaction, setNewTransaction] = useState<Transaction>(defaultTransaction);
-    const [profile, setProfile] = useState<User>()
+    const dispatch = useDispatch<AppDispatch>(); // Correctly typed useDispatch
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(10); // Number of transactions per page
+    // Accessing state from Redux store
+    const transactions = useSelector((state: RootState) => state.transactions.transactions);
+    const profile = useSelector((state: RootState) => state.user.profile);
+    const users = useSelector((state: RootState) => state.user.users);
 
-    const fetchTransactions = async () => {
-        try {
-            let data: TransactionsResponse;
-            if (profile && profile.id) {
-                data = await getTransactionsByUserId(profile.id, currentPage, rowsPerPage);
-            } else {
-                data = await getTransactions(currentPage, rowsPerPage);
-            }
-            setTransactions(data.transactions);
-            setTotalPages(data.total_pages);
-        } catch (error) {
-            console.error("Error fetching transactions:", error);
-        }
-    };
+    const [newTransaction, setNewTransaction] = React.useState(defaultTransaction);
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     useEffect(() => {
-        fetchTransactions();
-    }, [currentPage, rowsPerPage])
-
-
-    const fetchUsers = async () => {
-        try {
-            const data = await getUsers();
-            setUsers(data);
-        } catch (error) {
-            console.error("Error fetching users:", error);
+        if (profile) {
+            dispatch(fetchTransactionsByUser({ userId: profile.id, page: currentPage, per_page: rowsPerPage }));
+        } else {
+            dispatch(fetchTransactions({ page: currentPage, per_page: rowsPerPage }));
         }
-    };
-
-    const fetchProfile = async () => {
-        try {
-            const fetchedUser = await getProfile();
-            if (fetchedUser) {
-                setProfile(fetchedUser);
-            }
-        } catch (err) {
-            console.error('Profile fetch error:', err);
-        }
-    };
+    }, [dispatch, profile, currentPage, rowsPerPage]);
 
     useEffect(() => {
-        fetchTransactions();
-        fetchUsers();
-        fetchProfile();
-    }, []);
+        dispatch(fetchUsers());
+        dispatch(fetchProfile());
+    }, [dispatch]);
 
     const handleInputChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
         setNewTransaction(prevState => ({
@@ -90,26 +62,19 @@ const Transactions: React.FC = () => {
         }));
     };
 
-    if (!profile) {
-        return null;
-    }
-
     const submitForm = async () => {
         try {
-            const transactionToSubmit = { ...newTransaction, sender_id: profile.id, date_time: new Date().toISOString() };
-            await addTransaction(transactionToSubmit);
-            // await fetchTransactions();
-            await fetchTransactions();
-            setNewTransaction(defaultTransaction);  // Reset the form
+            if (profile) {
+                const transactionToSubmit = { ...newTransaction, sender_id: profile.id, date_time: new Date().toISOString() };
+                await dispatch(createTransaction(transactionToSubmit)).unwrap();
+                setNewTransaction(defaultTransaction);  // Reset the form
+            }
         } catch (error) {
             console.error("Error adding transaction:", error);
         }
     };
 
-    const handlePageChange = (
-        event: React.MouseEvent<HTMLButtonElement> | null,
-        newPage: number,
-    ) => {
+    const handlePageChange = (event: unknown, newPage: number) => {
         setCurrentPage(newPage);
     };
 
@@ -120,20 +85,23 @@ const Transactions: React.FC = () => {
         setCurrentPage(1);
     };
 
+    if (!profile) {
+        return null;
+    }
+
     return (
         <Container>
-            {profile ? <UserAvatar user={profile}></UserAvatar> : null}
-
+            {profile ? <UserAvatar user={profile} /> : null}
             <UserTransactionsTable
                 transactions={transactions}
-                userId={profile.id!}
-                totalPages={totalPages}
+                userId={profile?.id!}
+                totalPages={Math.ceil(transactions.length / rowsPerPage)}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
-            <Typography >{`Account Balance: ${profile.balance} EUR`}</Typography>
+            {profile && <Typography>{`Account Balance: ${profile.balance} EUR`}</Typography>}
             <TransactionForm
                 newTransaction={newTransaction}
                 users={users}
