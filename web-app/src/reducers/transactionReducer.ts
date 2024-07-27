@@ -5,12 +5,19 @@ import { createTransaction, fetchTransactions, fetchTransactionsByUser } from '.
 
 interface TransactionState {
     transactions: Transaction[];
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
     loading: boolean;
     error: string | null;
 }
 
+
 const initialState: TransactionState = {
     transactions: [],
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
     loading: false,
     error: null,
 };
@@ -27,6 +34,9 @@ const transactionSlice = createSlice({
             })
             .addCase(fetchTransactions.fulfilled, (state, action) => {
                 state.transactions = action.payload.transactions;
+                state.currentPage = action.payload.current_page;
+                state.totalPages = action.payload.total_pages;
+                state.totalItems = action.payload.total_items;
                 state.loading = false;
             })
             .addCase(fetchTransactions.rejected, (state, action) => {
@@ -39,6 +49,9 @@ const transactionSlice = createSlice({
             })
             .addCase(fetchTransactionsByUser.fulfilled, (state, action) => {
                 state.transactions = action.payload.transactions;
+                state.currentPage = action.payload.current_page;
+                state.totalPages = action.payload.total_pages;
+                state.totalItems = action.payload.total_items;
                 state.loading = false;
             })
             .addCase(fetchTransactionsByUser.rejected, (state, action) => {
