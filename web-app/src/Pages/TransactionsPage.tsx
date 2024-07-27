@@ -1,8 +1,7 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId, getUser, getProfile, TransactionsResponse } from '../api';
-import { Box, TextField, MenuItem, styled, Typography, Pagination, TablePagination } from '@mui/material';
+import { Box, TextField, MenuItem, styled, Typography } from '@mui/material';
 import TransactionForm from '../Components/TransactionForm';
-import TransactionsTable from '../Components/TransactionsTable';
 import UserAvatar from '../Components/UserAvatar';
 import UserTransactionsTable from '../Components/UserTransactionsTable';
 
@@ -24,7 +23,7 @@ const defaultTransaction: Transaction = {
 const Container = styled(Box)({
     display: "flex",
     flexDirection: "column",
-    gap: 50,
+    gap: 30,
     margin: 30,
 });
 
@@ -124,7 +123,7 @@ const Transactions: React.FC = () => {
     return (
         <Container>
             {profile ? <UserAvatar user={profile}></UserAvatar> : null}
-            {profile ? <Typography >{`Account Balance: ${profile.balance} EUR`}</Typography> : null}
+
             <UserTransactionsTable
                 transactions={transactions}
                 userId={profile.id!}
@@ -134,6 +133,7 @@ const Transactions: React.FC = () => {
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
+            <Typography >{`Account Balance: ${profile.balance} EUR`}</Typography>
             <TransactionForm
                 newTransaction={newTransaction}
                 users={users}
