@@ -5,9 +5,7 @@ import { Transaction, User } from '../api';
 const FormContainer = styled(Box)({
     display: "flex",
     flexDirection: "row",
-    gap: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "space-between",
 });
 
 interface TransactionFormProps {
@@ -28,37 +26,49 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     onSubmit
 }) => {
     return (
-        <FormContainer>
-            <TextField
-                onChange={onInputChange('amount')}
-                value={newTransaction.amount}
-                size="small"
-                helperText="Amount"
-                type="number"
-                variant="standard"
-            />
-            <TextField
-                onChange={onInputChange('currency')}
-                value={newTransaction.currency}
-                select
-                size="small"
-                helperText="Currency"
-                variant="standard"
-            >
-                {currencies.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                    </MenuItem>
-                ))}
-            </TextField>
-            {!activeUser && (
+        <Box sx={{ display: "flex", flexDirection: "column", width: 400, gap: 1 }}>
+            <FormContainer>
                 <TextField
-                    onChange={onInputChange('sender_id')}
-                    value={newTransaction.sender_id}
+                    onChange={onInputChange('amount')}
+                    value={newTransaction.amount}
+                    size="small"
+                    helperText="Amount"
+                    type="number"
+                />
+                <TextField
+                    onChange={onInputChange('currency')}
+                    value={newTransaction.currency}
                     select
                     size="small"
-                    helperText="Sender"
-                    variant="standard"
+                    helperText="Currency"
+                >
+                    {currencies.map(option => (
+                        <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                {!activeUser && (
+                    <TextField
+                        onChange={onInputChange('sender_id')}
+                        value={newTransaction.sender_id}
+                        select
+                        size="small"
+                        helperText="Sender"
+                    >
+                        {users.map(user => (
+                            <MenuItem key={user.id} value={user.id}>
+                                {user.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                )}
+                <TextField
+                    onChange={onInputChange('receiver_id')}
+                    value={newTransaction.receiver_id}
+                    select
+                    size="small"
+                    helperText="Receiver"
                 >
                     {users.map(user => (
                         <MenuItem key={user.id} value={user.id}>
@@ -66,23 +76,10 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                         </MenuItem>
                     ))}
                 </TextField>
-            )}
-            <TextField
-                onChange={onInputChange('receiver_id')}
-                value={newTransaction.receiver_id}
-                select
-                size="small"
-                helperText="Receiver"
-                variant="standard"
-            >
-                {users.map(user => (
-                    <MenuItem key={user.id} value={user.id}>
-                        {user.name}
-                    </MenuItem>
-                ))}
-            </TextField>
+
+            </FormContainer>
             <Button onClick={onSubmit} variant="contained">Submit</Button>
-        </FormContainer>
+        </Box>
     );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId, getUser, getProfile, TransactionsResponse } from '../api';
-import { Box, TextField, MenuItem, styled, Typography, Pagination } from '@mui/material';
+import { Box, TextField, MenuItem, styled, Typography, Pagination, TablePagination } from '@mui/material';
 import TransactionForm from '../Components/TransactionForm';
 import TransactionsTable from '../Components/TransactionsTable';
 import UserAvatar from '../Components/UserAvatar';
@@ -36,15 +36,15 @@ const Transactions: React.FC = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const perPage = 10; // Number of transactions per page
+    const [rowsPerPage, setRowsPerPage] = useState(10); // Number of transactions per page
 
     const fetchTransactions = async () => {
         try {
             let data: TransactionsResponse;
             if (profile && profile.id) {
-                data = await getTransactionsByUserId(profile.id, currentPage, perPage);
+                data = await getTransactionsByUserId(profile.id, currentPage, rowsPerPage);
             } else {
-                data = await getTransactions(currentPage, perPage);
+                data = await getTransactions(currentPage, rowsPerPage);
             }
             setTransactions(data.transactions);
             setTotalPages(data.total_pages);
@@ -55,7 +55,7 @@ const Transactions: React.FC = () => {
 
     useEffect(() => {
         fetchTransactions();
-    }, [currentPage])
+    }, [currentPage, rowsPerPage])
 
 
     const fetchUsers = async () => {
@@ -107,16 +107,33 @@ const Transactions: React.FC = () => {
         }
     };
 
-    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-        setCurrentPage(value);
+    const handlePageChange = (
+        event: React.MouseEvent<HTMLButtonElement> | null,
+        newPage: number,
+    ) => {
+        setCurrentPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setCurrentPage(1);
     };
 
     return (
         <Container>
             {profile ? <UserAvatar user={profile}></UserAvatar> : null}
             {profile ? <Typography >{`Account Balance: ${profile.balance} EUR`}</Typography> : null}
-            {profile ? <UserTransactionsTable transactions={transactions} userId={profile.id!} /> : null}
-            <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} color="primary" />
+            <UserTransactionsTable
+                transactions={transactions}
+                userId={profile.id!}
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
             <TransactionForm
                 newTransaction={newTransaction}
                 users={users}
