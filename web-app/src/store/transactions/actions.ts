@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { addTransaction, getTransactions, getTransactionsByUserId, Transaction, TransactionsResponse } from '../api';
+import { TransactionsResponse, getTransactions, getTransactionsByUserId, Transaction, addTransaction } from '../../api/transactions';
 
 export const fetchTransactions = createAsyncThunk<TransactionsResponse, { page: number; per_page: number }>(
     'transactions/fetchTransactions',

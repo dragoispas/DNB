@@ -1,13 +1,13 @@
 import React, { useEffect, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchTransactions, fetchTransactionsByUser, createTransaction } from '../actions/transactionActions';
-import { RootState, AppDispatch } from '../store';
-import { Box, TextField, MenuItem, styled, Typography, TablePagination } from '@mui/material';
-import TransactionForm from '../Components/TransactionForm';
-import UserAvatar from '../Components/UserAvatar';
-import UserTransactionsTable from '../Components/UserTransactionsTable';
-import { fetchProfile } from '../actions/profileActions';
-import { fetchUsers } from '../actions/usersActions';
+import { Box, styled, Typography } from '@mui/material';
+import TransactionForm from '../components/TransactionForm';
+import UserAvatar from '../components/UserAvatar';
+import UserTransactionsTable from '../components/UserTransactionsTable';
+import { AppDispatch, RootState } from '../store/store';
+import { fetchProfile } from '../store/auth/actions';
+import { fetchUsers } from '../store/users/actions';
+import { fetchTransactionsByUser, createTransaction } from '../store/transactions/actions';
 
 const currencies = [
     { value: 'USD', label: '$' },

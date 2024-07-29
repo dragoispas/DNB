@@ -1,9 +1,8 @@
-// actions/profileActions.ts
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { User, RegisterRequest, RegisterResponse, LoginRequest, LoginResponse } from '../api';
-import { getProfile, login, register } from '../api';
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { getProfile, LoginResponse, LoginRequest, login, RegisterResponse, RegisterRequest, register, Profile } from "../../api/auth";
 
-export const fetchProfile = createAsyncThunk<User | null>(
+
+export const fetchProfile = createAsyncThunk<Profile | null>(
     'profile/fetchProfile',
     async () => {
         return await getProfile();

@@ -1,17 +1,6 @@
 // reducers/transactionReducer.ts
 import { createSlice } from '@reduxjs/toolkit';
-import { Transaction } from '../api';
-import { createTransaction, fetchTransactions, fetchTransactionsByUser } from '../actions/transactionActions';
-
-interface TransactionState {
-    transactions: Transaction[];
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-    loading: boolean;
-    error: string | null;
-}
-
+import { createTransaction, fetchTransactions, fetchTransactionsByUser, TransactionState } from '.';
 
 const initialState: TransactionState = {
     transactions: [],

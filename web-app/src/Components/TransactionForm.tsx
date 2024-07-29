@@ -1,6 +1,8 @@
 import React, { ChangeEvent } from 'react';
 import { TextField, MenuItem, Button, Box, styled } from '@mui/material';
-import { Transaction, User } from '../api';
+import { Transaction } from '../api/transactions';
+import { Profile } from '../api/auth';
+import { User } from '../api/users';
 
 const FormContainer = styled(Box)({
     display: "flex",
@@ -11,7 +13,7 @@ const FormContainer = styled(Box)({
 interface TransactionFormProps {
     newTransaction: Transaction;
     users: User[];
-    activeUser?: User;
+    activeUser?: Profile;
     currencies: { value: string; label: string }[];
     onInputChange: (field: string) => (event: ChangeEvent<HTMLInputElement>) => void;
     onSubmit: () => void;

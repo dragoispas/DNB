@@ -1,5 +1,5 @@
-import { Transaction } from "../api";
 import { TableContainer, Paper, TableHead, TableRow, TableCell, TableBody, Table, styled, TablePagination, Typography } from "@mui/material";
+import { Transaction } from "../api/transactions";
 
 const StyledTable = styled(Table)({
     minWidth: 650,

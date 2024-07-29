@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Avatar, Paper, Grid } from '@mui/material';
-import { getProfile, User } from '../api';
-import UserAvatar from '../Components/UserAvatar';
+import UserAvatar from '../components/UserAvatar';
+import { getProfile, Profile } from '../api/auth';
 
 const ProfilePage: React.FC = () => {
-    const [user, setUser] = useState<User>();
+    const [profile, setProfile] = useState<Profile>();
     const [error, setError] = useState<string>('');
     const navigate = useNavigate();
 
@@ -15,7 +15,7 @@ const ProfilePage: React.FC = () => {
                 const fetchedUser = await getProfile();
                 console.log(fetchedUser);
                 if (fetchedUser) {
-                    setUser(fetchedUser);
+                    setProfile(fetchedUser);
                 } else {
                     setError('Failed to fetch profile');
                 }
@@ -38,19 +38,19 @@ const ProfilePage: React.FC = () => {
         navigate('/login');
     };
 
-    if (!user) {
+    if (!profile) {
         return <Typography>Loading...</Typography>;
     }
 
     return (
         <Box sx={{ padding: 2 }}>
             <Paper elevation={3} sx={{ padding: 2, maxWidth: 600, margin: '0 auto' }}>
-                <UserAvatar user={user} />
+                <UserAvatar user={profile} />
                 <Box sx={{ marginTop: 2 }}>
-                    <Typography variant="body1"><strong>Email:</strong> {user.email}</Typography>
-                    <Typography variant="body1"><strong>Gender:</strong> {user.gender}</Typography>
-                    <Typography variant="body1"><strong>Birth Date:</strong> {user.birth_date}</Typography>
-                    <Typography variant="body1"><strong>Balance:</strong> {user.balance} EUR</Typography>
+                    <Typography variant="body1"><strong>Email:</strong> {profile.email}</Typography>
+                    <Typography variant="body1"><strong>Gender:</strong> {profile.gender}</Typography>
+                    <Typography variant="body1"><strong>Birth Date:</strong> {profile.birth_date}</Typography>
+                    <Typography variant="body1"><strong>Balance:</strong> {profile.balance} EUR</Typography>
                 </Box>
                 {error && <Typography color="error">{error}</Typography>}
                 <Box sx={{ marginTop: 2, gap: 2, display: "flex" }}>

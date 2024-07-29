@@ -5,12 +5,6 @@ from project.models import db, Transaction
 transaction_bp = Blueprint("transactions", __name__)
 
 
-from flask import Blueprint, jsonify, request
-from project.models import db, Transaction
-
-transaction_bp = Blueprint("transactions", __name__)
-
-
 @transaction_bp.route("/transactions", methods=["GET"])
 def get_transactions():
     currency = request.args.get("currency")

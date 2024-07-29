@@ -1,7 +1,6 @@
 // src/components/PrivateRoute.tsx
 import React, { ComponentType } from 'react';
 import { Navigate, RouteProps } from 'react-router-dom';
-import { isAuthenticated } from '../auth';
 
 interface PrivateRouteProps {
     component: ComponentType<any>;

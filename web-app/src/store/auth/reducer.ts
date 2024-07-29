@@ -1,7 +1,5 @@
-// reducers/profileReducer.ts
-import { createSlice } from '@reduxjs/toolkit';
-import { ProfileState } from './types';
-import { fetchProfile, loginUser, registerUser } from '../actions/profileActions';
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchProfile, loginUser, registerUser, ProfileState } from ".";
 
 const initialState: ProfileState = {
     profile: null,

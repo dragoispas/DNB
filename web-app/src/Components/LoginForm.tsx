@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField } from '@mui/material';
-import { login } from '../api';
+import { login } from '../api/auth';
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
