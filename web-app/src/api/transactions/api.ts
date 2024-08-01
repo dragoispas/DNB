@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_BASE_URL } from "../config";
 import { Transaction, TransactionsResponse } from ".";
+import { TransactionToSubmit } from "./types";
 
 
 export const getTransactions = async (page: number = 1, per_page: number = 10): Promise<TransactionsResponse> => {
@@ -15,7 +16,7 @@ export const getTransactions = async (page: number = 1, per_page: number = 10): 
     }
 };
 
-export const getTransactionsByUserId = async (userId: number, page: number = 1, per_page: number = 10): Promise<TransactionsResponse> => {
+export const getTransactionsByUserId = async (userId: number, page: number, per_page: number): Promise<TransactionsResponse> => {
     try {
         const response = await axios.get<TransactionsResponse>(`${API_BASE_URL}/transactions`, {
             params: { user_id: userId, page, per_page }
@@ -27,7 +28,7 @@ export const getTransactionsByUserId = async (userId: number, page: number = 1, 
     }
 };
 
-export const addTransaction = async (transaction: Transaction): Promise<Transaction> => {
+export const addTransaction = async (transaction: TransactionToSubmit): Promise<Transaction> => {
     try {
         const response = await axios.post<Transaction>(`${API_BASE_URL}/transactions`, transaction);
         return response.data;

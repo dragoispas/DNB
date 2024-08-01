@@ -48,6 +48,11 @@ export const getProfile = async (): Promise<Profile | null> => {
         const message = axios.isAxiosError(error) && error.response?.data?.message
             ? error.response.data.message
             : 'An unknown error occurred';
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+            console.error('Token has expired or is invalid');
+            localStorage.removeItem('authToken');
+            return null;
+        }
 
         console.error('Failed to fetch profile:', message);
         return null;

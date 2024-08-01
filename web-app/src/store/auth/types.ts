@@ -1,7 +1,6 @@
-import { User } from "../../api/users/types";
+import { Profile } from "../../api/auth";
+
 
 export interface ProfileState {
-    profile: User | null;
-    loading: boolean;
-    error: string | null;
+    profile: Profile | null;
 }

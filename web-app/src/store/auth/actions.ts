@@ -1,24 +1,34 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getProfile, LoginResponse, LoginRequest, login, RegisterResponse, RegisterRequest, register, Profile } from "../../api/auth";
+import { setProfile } from ".";
+import { getProfile, LoginRequest, LoginResponse, login, logout, RegisterRequest, register } from "../../api/auth";
+import { AppDispatch } from "../store";
 
+export const fetchProfile = () => async (dispatch: AppDispatch) => {
+    try {
+        const profile = await getProfile();
+        if (profile) dispatch(setProfile(profile));
+    } catch (error) { }
+};
 
-export const fetchProfile = createAsyncThunk<Profile | null>(
-    'profile/fetchProfile',
-    async () => {
-        return await getProfile();
-    }
-);
+export const loginUser = (credentials: LoginRequest) => async (dispatch: AppDispatch) => {
+    try {
+        const response: LoginResponse = await login(credentials);
+        if (response.success) {
+            if (response.token) localStorage.setItem('authToken', response.token);
+            dispatch(fetchProfile());
+        }
+    } catch (error) { }
+}
 
-export const loginUser = createAsyncThunk<LoginResponse, LoginRequest>(
-    'profile/loginUser',
-    async (credentials) => {
-        return await login(credentials);
-    }
-);
+export const logoutUser = () => async (dispatch: AppDispatch) => {
+    try {
+        await logout();
+        dispatch(setProfile(null));
 
-export const registerUser = createAsyncThunk<RegisterResponse, RegisterRequest>(
-    'profile/registerUser',
-    async (user) => {
-        return await register(user);
-    }
-);
+    } catch (error) { }
+}
+
+export const registerUser = (user: RegisterRequest) => async () => {
+    try {
+        await register(user)
+    } catch (error) { }
+}

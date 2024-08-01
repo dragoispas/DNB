@@ -1,7 +1,10 @@
 import { User } from "../../api/users";
 
+export type UsersMap = {
+    [id: number]: User
+}
+
 export interface UsersState {
-    users: User[];
-    loading: boolean;
-    error: string | null;
+    userIds: number[];
+    usersMap: UsersMap;
 }

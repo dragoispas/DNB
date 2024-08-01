@@ -1,2 +1,3 @@
-export { fetchUser, fetchUsers } from './actions'
-export type { UsersState } from './types'
+export * from './actions'
+export * from './types'
+export * from './slice'

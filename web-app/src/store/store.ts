@@ -1,8 +1,8 @@
 // store.ts
 import { configureStore } from '@reduxjs/toolkit';
-import usersReducer from './users/reducer'
-import profileReducer from './auth/reducer'
-import transactionsReducer from './transactions/reducer'
+import usersReducer from './users/slice'
+import profileReducer from './auth/slice'
+import transactionsReducer from './transactions/slice'
 
 const store = configureStore({
     reducer: {

@@ -1,13 +1,14 @@
-import React, { useEffect, ChangeEvent } from 'react';
+import React, { useEffect, ChangeEvent, useTransition, lazy } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, styled, Typography } from '@mui/material';
 import TransactionForm from '../components/TransactionForm';
 import UserAvatar from '../components/UserAvatar';
 import UserTransactionsTable from '../components/UserTransactionsTable';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchProfile } from '../store/auth/actions';
 import { fetchUsers } from '../store/users/actions';
-import { fetchTransactionsByUser, createTransaction } from '../store/transactions/actions';
+import { useAuth } from '../hooks/useAuth';
+import { useTransactions } from '../hooks/useTransactions';
+import { useUsers } from '../hooks/useUsers';
 
 const currencies = [
     { value: 'USD', label: '$' },
@@ -32,28 +33,20 @@ const Container = styled(Box)({
 });
 
 const Transactions: React.FC = () => {
-    const dispatch = useDispatch<AppDispatch>(); // Correctly typed useDispatch
-
     // Accessing state from Redux store
-    const transactions = useSelector((state: RootState) => state.transactions.transactions);
-    const totalItems = useSelector((state: RootState) => state.transactions.totalItems);
-    const profile = useSelector((state: RootState) => state.profile.profile);
-    const users = useSelector((state: RootState) => state.users.users);
+    const { transactions, transactionsCount, currentPage, transactionsPerPage, getTransactions, addTransaction, setCurrentPage, setTransactionsPerPage } = useTransactions({})
+    const { profile, getProfile } = useAuth({ lazy: true });
+    const { users, getUsers } = useUsers();
 
     const [newTransaction, setNewTransaction] = React.useState(defaultTransaction);
-    const [currentPage, setCurrentPage] = React.useState(1);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     useEffect(() => {
-        if (profile) {
-            dispatch(fetchTransactionsByUser({ userId: profile.id, page: currentPage, per_page: rowsPerPage }));
-        }
-    }, [dispatch, profile, currentPage, rowsPerPage]);
+        if (!profile) getProfile();
+        if (Object.keys(users).length === 0) getUsers();
+        if (Object.keys(transactions).length === 0) getTransactions();
+    }, []);
 
-    useEffect(() => {
-        dispatch(fetchUsers());
-        dispatch(fetchProfile());
-    }, [dispatch]);
+    if (!profile) return null;
 
     const handleInputChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
         setNewTransaction(prevState => ({
@@ -64,15 +57,10 @@ const Transactions: React.FC = () => {
 
     const submitForm = async () => {
         try {
-            if (profile) {
-                const transactionToSubmit = { ...newTransaction, sender_id: profile.id, date_time: new Date().toISOString() };
-                await dispatch(createTransaction(transactionToSubmit)).unwrap();
-                setNewTransaction(defaultTransaction);  // Reset the form
-                dispatch(fetchTransactionsByUser({ userId: profile.id, page: currentPage, per_page: rowsPerPage })); // Refetch transactions after creating new one
-            }
-        } catch (error) {
-            console.error("Error adding transaction:", error);
-        }
+            const transactionToSubmit = { ...newTransaction, sender_id: profile.id, date_time: new Date().toISOString() };
+            await addTransaction(transactionToSubmit);
+            await getTransactions();
+        } catch (error) { }
     };
 
     const handlePageChange = (event: unknown, newPage: number) => {
@@ -82,7 +70,7 @@ const Transactions: React.FC = () => {
     const handleChangeRowsPerPage = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+        setTransactionsPerPage(parseInt(event.target.value, 10));
         setCurrentPage(1);
     };
 
@@ -96,16 +84,16 @@ const Transactions: React.FC = () => {
             <UserTransactionsTable
                 transactions={transactions}
                 userId={profile?.id!}
-                totalPages={Math.ceil(totalItems / rowsPerPage)}
+                totalPages={Math.ceil(transactionsCount / transactionsPerPage)}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
-                rowsPerPage={rowsPerPage}
+                rowsPerPage={transactionsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
             {profile && <Typography>{`Account Balance: ${profile.balance} EUR`}</Typography>}
             <TransactionForm
                 newTransaction={newTransaction}
-                users={users}
+                users={Object.values(users)}
                 activeUser={profile}
                 currencies={currencies}
                 onInputChange={handleInputChange}

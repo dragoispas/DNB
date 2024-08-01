@@ -3,6 +3,7 @@ import { TextField, MenuItem, Button, Box, styled } from '@mui/material';
 import { Transaction } from '../api/transactions';
 import { Profile } from '../api/auth';
 import { User } from '../api/users';
+import { TransactionToSubmit } from '../api/transactions/types';
 
 const FormContainer = styled(Box)({
     display: "flex",
@@ -11,7 +12,7 @@ const FormContainer = styled(Box)({
 });
 
 interface TransactionFormProps {
-    newTransaction: Transaction;
+    newTransaction: TransactionToSubmit;
     users: User[];
     activeUser?: Profile;
     currencies: { value: string; label: string }[];

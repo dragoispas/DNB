@@ -1,17 +1,10 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getUsers, getUser } from "../../api/users/api";
-import { User } from "../../api/users/types";
+import { getUsers } from "../../api/users";
+import { AppDispatch } from "../store";
+import { setUsers } from ".";
 
-export const fetchUsers = createAsyncThunk<User[]>(
-    'users/fetchUsers',
-    async () => {
-        return await getUsers();
-    }
-);
-
-export const fetchUser = createAsyncThunk<User, string>(
-    'user/fetchUser',
-    async (id) => {
-        return await getUser(id);
-    }
-);
+export const fetchUsers = () => async (dispatch: AppDispatch) => {
+    try {
+        const profile = await getUsers();
+        if (profile) dispatch(setUsers(profile));
+    } catch (error) { }
+};

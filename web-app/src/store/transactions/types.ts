@@ -1,10 +1,14 @@
 import { Transaction } from "../../api/transactions";
 
+export type TransactionsMap = {
+    [id: number]: Transaction
+}
+
 export interface TransactionState {
-    transactions: Transaction[];
-    currentPage: number;
+    transactionsIds: number[];
+    transactionsMap: TransactionsMap;
+    page: number;
     totalPages: number;
     totalItems: number;
-    loading: boolean;
-    error: string | null;
+    itemsPerPage: number;
 }
