@@ -7,12 +7,16 @@ import { useAuth } from '../hooks/useAuth';
 const ProfilePage: React.FC = () => {
     const navigate = useNavigate();
 
-    const { profile, logout } = useAuth();
+    const { profile, logout, getProfile } = useAuth();
 
 
     const handleTransactionsOnClick = () => {
         navigate('/');
     };
+
+    useEffect(() => {
+        if (!profile) getProfile();
+    })
 
     if (!profile) {
         return <Typography>Loading...</Typography>;

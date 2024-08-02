@@ -32,7 +32,7 @@ export const getProfile = async (): Promise<Profile | null> => {
     const token = localStorage.getItem('authToken');
     if (!token) {
         console.error('No token found');
-        return null; // or handle as you need, e.g., redirect to login
+        return null;
     }
 
     try {

@@ -3,17 +3,34 @@ import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../store/store";
 import { LoginRequest, RegisterRequest } from "../api/auth";
 import { fetchProfile, loginUser, logoutUser, registerUser } from "../store/auth";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
-interface Props {
-    lazy?: boolean;
-}
 
-export const useAuth = ({ lazy = false }: Props = {}) => {
+export const useAuth = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const profile = useSelector((state: RootState) => state.profile.profile);
-    const isAuthenticated = localStorage.getItem('authToken') !== null;
+    const isAuthenticated = useRef(localStorage.getItem('authToken') !== null);
+
+    useEffect(() => {
+        const checkAuth = () => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                isAuthenticated.current = true;
+            } else {
+                isAuthenticated.current = false;
+                navigate('/login');
+            }
+        };
+
+        checkAuth();
+
+        window.addEventListener('storage', checkAuth);
+
+        return () => {
+            window.removeEventListener('storage', checkAuth);
+        };
+    }, [isAuthenticated])
 
     const getProfile = useCallback(async () => {
         try {
@@ -27,7 +44,6 @@ export const useAuth = ({ lazy = false }: Props = {}) => {
         try {
             await dispatch(loginUser(credentials));
             navigate('/profile');
-            await getProfile();
         } catch (error) {
             console.error("Login failed:", error);
         }

@@ -6,7 +6,7 @@ const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login } = useAuth({ lazy: true });
+    const { login } = useAuth();
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();

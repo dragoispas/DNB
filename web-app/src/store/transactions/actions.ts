@@ -4,9 +4,9 @@ import { AppDispatch } from '../store';
 import { setTransactions, setTotalItems, setTotalPages } from './slice';
 
 
-export const fetchTransactionsByUser = (userId: number, page: number, itemsPerPage: number) => async (dispatch: AppDispatch) => {
+export const fetchTransactionsByUser = (page: number, itemsPerPage: number) => async (dispatch: AppDispatch) => {
     try {
-        const response: TransactionsResponse = await getTransactionsByUserId(userId, page, itemsPerPage);
+        const response: TransactionsResponse | null = await getTransactionsByUserId(page, itemsPerPage);
         if (response) {
             dispatch(setTransactions(response.transactions))
             dispatch(setTotalItems(response.total_items))

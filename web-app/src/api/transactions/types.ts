@@ -11,7 +11,6 @@ export interface TransactionToSubmit {
     amount: number;
     currency: string;
     date_time?: string;
-    sender_id: number;
     receiver_id: number;
 }
 

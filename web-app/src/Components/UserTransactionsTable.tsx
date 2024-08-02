@@ -10,6 +10,7 @@ interface Props {
     userId: number;
     currentPage: number;
     totalPages: number;
+    totalItems: number;
     rowsPerPage: number;
     onPageChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
@@ -18,8 +19,9 @@ interface Props {
 const UserTransactionsTable: React.FC<Props> = ({
     transactions,
     userId,
-    currentPage,
+    currentPage = 1,
     totalPages,
+    totalItems,
     rowsPerPage,
     onPageChange,
     onRowsPerPageChange,
@@ -58,7 +60,7 @@ const UserTransactionsTable: React.FC<Props> = ({
             </TableContainer>
             <TablePagination
                 component="div"
-                count={totalPages * rowsPerPage} // This should be the total number of items
+                count={totalItems} // This should be the total number of items
                 page={currentPage}
                 onPageChange={onPageChange}
                 rowsPerPage={rowsPerPage}

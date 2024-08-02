@@ -35,12 +35,13 @@ const Container = styled(Box)({
 const Transactions: React.FC = () => {
     // Accessing state from Redux store
     const { transactions, transactionsCount, currentPage, transactionsPerPage, getTransactions, addTransaction, setCurrentPage, setTransactionsPerPage } = useTransactions({})
-    const { profile, getProfile } = useAuth({ lazy: true });
+    const { profile, getProfile } = useAuth();
     const { users, getUsers } = useUsers();
 
     const [newTransaction, setNewTransaction] = React.useState(defaultTransaction);
 
     useEffect(() => {
+        console.log(Object.keys(transactions).length);
         if (!profile) getProfile();
         if (Object.keys(users).length === 0) getUsers();
         if (Object.keys(transactions).length === 0) getTransactions();
@@ -86,6 +87,7 @@ const Transactions: React.FC = () => {
                 userId={profile?.id!}
                 totalPages={Math.ceil(transactionsCount / transactionsPerPage)}
                 currentPage={currentPage}
+                totalItems={transactionsCount}
                 onPageChange={handlePageChange}
                 rowsPerPage={transactionsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
@@ -94,7 +96,6 @@ const Transactions: React.FC = () => {
             <TransactionForm
                 newTransaction={newTransaction}
                 users={Object.values(users)}
-                activeUser={profile}
                 currencies={currencies}
                 onInputChange={handleInputChange}
                 onSubmit={submitForm}

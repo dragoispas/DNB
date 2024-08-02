@@ -11,7 +11,7 @@ const RegisterForm: React.FC = () => {
     const [birthDate, setBirthDate] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { register } = useAuth({ lazy: true });
+    const { register } = useAuth();
 
     const handleRegister = async (event: React.FormEvent) => {
         event.preventDefault();

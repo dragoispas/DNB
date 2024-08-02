@@ -11,7 +11,7 @@ interface Props {
 
 export const useTransactions = ({ lazy = false }: Props = {}) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { isAuthenticated, profile } = useAuth({ lazy: true });
+    const { profile } = useAuth();
     const transactions = useSelector((state: RootState) => state.transactions.transactionsMap);
     const transactionsCount = useSelector((state: RootState) => state.transactions.totalItems);
     const currentPage = useSelector((state: RootState) => state.transactions.page);
@@ -24,11 +24,10 @@ export const useTransactions = ({ lazy = false }: Props = {}) => {
     }, [currentPage, transactionsPerPage])
 
     const getTransactions = useCallback(async () => {
-        if (!profile) return;
         setLoading(true);
         setError(null);
         try {
-            await dispatch(fetchTransactionsByUser(profile.id, currentPage, transactionsPerPage));
+            await dispatch(fetchTransactionsByUser(currentPage, transactionsPerPage));
         } catch (error) {
             setError("Failed to fetch transactions");
         } finally {
@@ -44,6 +43,7 @@ export const useTransactions = ({ lazy = false }: Props = {}) => {
             setError("Failed to add transaction");
         } finally {
             setLoading(false);
+            getTransactions();
         }
     }, [dispatch]);
 
