@@ -16,7 +16,7 @@ const ProfilePage: React.FC = () => {
 
     useEffect(() => {
         if (!profile) getProfile();
-    })
+    }, [])
 
     if (!profile) {
         return <Typography>Loading...</Typography>;

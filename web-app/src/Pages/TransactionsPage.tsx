@@ -1,11 +1,8 @@
-import React, { useEffect, ChangeEvent, useTransition, lazy } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, ChangeEvent } from 'react';
 import { Box, styled, Typography } from '@mui/material';
 import TransactionForm from '../components/TransactionForm';
 import UserAvatar from '../components/UserAvatar';
 import UserTransactionsTable from '../components/UserTransactionsTable';
-import { AppDispatch, RootState } from '../store/store';
-import { fetchUsers } from '../store/users/actions';
 import { useAuth } from '../hooks/useAuth';
 import { useTransactions } from '../hooks/useTransactions';
 import { useUsers } from '../hooks/useUsers';
