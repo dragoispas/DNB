@@ -1,9 +1,11 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Transaction, getTransactions, addTransaction, User, getUsers, getTransactionsByUserId, getUser, getProfile, TransactionsResponse } from '../api';
-import { Box, TextField, MenuItem, styled, Typography } from '@mui/material';
-import TransactionForm from '../Components/TransactionForm';
-import UserAvatar from '../Components/UserAvatar';
-import UserTransactionsTable from '../Components/UserTransactionsTable';
+import React, { useEffect, ChangeEvent } from 'react';
+import { Box, styled, Typography } from '@mui/material';
+import TransactionForm from '../components/TransactionForm';
+import UserAvatar from '../components/UserAvatar';
+import UserTransactionsTable from '../components/UserTransactionsTable';
+import { useAuth } from '../hooks/useAuth';
+import { useTransactions } from '../hooks/useTransactions';
+import { useUsers } from '../hooks/useUsers';
 
 const currencies = [
     { value: 'USD', label: '$' },
@@ -12,7 +14,7 @@ const currencies = [
     { value: 'JPY', label: '¥' },
 ];
 
-const defaultTransaction: Transaction = {
+const defaultTransaction = {
     amount: 0,
     currency: 'EUR',
     date_time: '',
@@ -28,60 +30,21 @@ const Container = styled(Box)({
 });
 
 const Transactions: React.FC = () => {
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
-    const [newTransaction, setNewTransaction] = useState<Transaction>(defaultTransaction);
-    const [profile, setProfile] = useState<User>()
+    // Accessing state from Redux store
+    const { transactions, transactionsCount, currentPage, transactionsPerPage, getTransactions, addTransaction, setCurrentPage, setTransactionsPerPage } = useTransactions({})
+    const { profile, getProfile } = useAuth();
+    const { users, getUsers } = useUsers();
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(10); // Number of transactions per page
-
-    const fetchTransactions = async () => {
-        try {
-            let data: TransactionsResponse;
-            if (profile && profile.id) {
-                data = await getTransactionsByUserId(profile.id, currentPage, rowsPerPage);
-            } else {
-                data = await getTransactions(currentPage, rowsPerPage);
-            }
-            setTransactions(data.transactions);
-            setTotalPages(data.total_pages);
-        } catch (error) {
-            console.error("Error fetching transactions:", error);
-        }
-    };
+    const [newTransaction, setNewTransaction] = React.useState(defaultTransaction);
 
     useEffect(() => {
-        fetchTransactions();
-    }, [currentPage, rowsPerPage])
-
-
-    const fetchUsers = async () => {
-        try {
-            const data = await getUsers();
-            setUsers(data);
-        } catch (error) {
-            console.error("Error fetching users:", error);
-        }
-    };
-
-    const fetchProfile = async () => {
-        try {
-            const fetchedUser = await getProfile();
-            if (fetchedUser) {
-                setProfile(fetchedUser);
-            }
-        } catch (err) {
-            console.error('Profile fetch error:', err);
-        }
-    };
-
-    useEffect(() => {
-        fetchTransactions();
-        fetchUsers();
-        fetchProfile();
+        console.log(Object.keys(transactions).length);
+        if (!profile) getProfile();
+        if (Object.keys(users).length === 0) getUsers();
+        if (Object.keys(transactions).length === 0) getTransactions();
     }, []);
+
+    if (!profile) return null;
 
     const handleInputChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
         setNewTransaction(prevState => ({
@@ -90,54 +53,46 @@ const Transactions: React.FC = () => {
         }));
     };
 
-    if (!profile) {
-        return null;
-    }
-
     const submitForm = async () => {
         try {
             const transactionToSubmit = { ...newTransaction, sender_id: profile.id, date_time: new Date().toISOString() };
             await addTransaction(transactionToSubmit);
-            // await fetchTransactions();
-            await fetchTransactions();
-            setNewTransaction(defaultTransaction);  // Reset the form
-        } catch (error) {
-            console.error("Error adding transaction:", error);
-        }
+            await getTransactions();
+        } catch (error) { }
     };
 
-    const handlePageChange = (
-        event: React.MouseEvent<HTMLButtonElement> | null,
-        newPage: number,
-    ) => {
+    const handlePageChange = (event: unknown, newPage: number) => {
         setCurrentPage(newPage);
     };
 
     const handleChangeRowsPerPage = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+        setTransactionsPerPage(parseInt(event.target.value, 10));
         setCurrentPage(1);
     };
 
+    if (!profile) {
+        return null;
+    }
+
     return (
         <Container>
-            {profile ? <UserAvatar user={profile}></UserAvatar> : null}
-
+            {profile ? <UserAvatar user={profile} /> : null}
             <UserTransactionsTable
                 transactions={transactions}
-                userId={profile.id!}
-                totalPages={totalPages}
+                userId={profile?.id!}
+                totalPages={Math.ceil(transactionsCount / transactionsPerPage)}
                 currentPage={currentPage}
+                totalItems={transactionsCount}
                 onPageChange={handlePageChange}
-                rowsPerPage={rowsPerPage}
+                rowsPerPage={transactionsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
-            <Typography >{`Account Balance: ${profile.balance} EUR`}</Typography>
+            {profile && <Typography>{`Account Balance: ${profile.balance} EUR`}</Typography>}
             <TransactionForm
                 newTransaction={newTransaction}
-                users={users}
-                activeUser={profile}
+                users={Object.values(users)}
                 currencies={currencies}
                 onInputChange={handleInputChange}
                 onSubmit={submitForm}

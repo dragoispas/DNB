@@ -1,15 +1,16 @@
-import { Transaction } from "../api";
 import { TableContainer, Paper, TableHead, TableRow, TableCell, TableBody, Table, styled, TablePagination, Typography } from "@mui/material";
+import { TransactionsMap } from "../store/transactions/types";
 
 const StyledTable = styled(Table)({
     minWidth: 650,
 });
 
 interface Props {
-    transactions: Transaction[];
+    transactions: TransactionsMap;
     userId: number;
     currentPage: number;
     totalPages: number;
+    totalItems: number;
     rowsPerPage: number;
     onPageChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
@@ -18,8 +19,9 @@ interface Props {
 const UserTransactionsTable: React.FC<Props> = ({
     transactions,
     userId,
-    currentPage,
+    currentPage = 1,
     totalPages,
+    totalItems,
     rowsPerPage,
     onPageChange,
     onRowsPerPageChange,
@@ -39,7 +41,7 @@ const UserTransactionsTable: React.FC<Props> = ({
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {transactions.map(row => (
+                        {Object.values(transactions).map(row => (
                             <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell component="th" scope="row">{row.id}</TableCell>
                                 <TableCell align="right">{row.amount}</TableCell>
@@ -58,7 +60,7 @@ const UserTransactionsTable: React.FC<Props> = ({
             </TableContainer>
             <TablePagination
                 component="div"
-                count={totalPages * rowsPerPage} // This should be the total number of items
+                count={totalItems} // This should be the total number of items
                 page={currentPage}
                 onPageChange={onPageChange}
                 rowsPerPage={rowsPerPage}

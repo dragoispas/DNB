@@ -1,8 +1,8 @@
 import React from 'react';
 import { Avatar, Typography, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { User } from '../api';
 import { useNavigate } from 'react-router-dom';
+import { User } from '../api/users';
 
 // Function to get initials from name
 const getInitials = (name: string) => {

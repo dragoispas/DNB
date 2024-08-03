@@ -1,6 +1,8 @@
 import React, { ChangeEvent } from 'react';
 import { TextField, MenuItem, Button, Box, styled } from '@mui/material';
-import { Transaction, User } from '../api';
+import { Profile } from '../api/auth';
+import { User } from '../api/users';
+import { TransactionToSubmit } from '../api/transactions/types';
 
 const FormContainer = styled(Box)({
     display: "flex",
@@ -9,9 +11,8 @@ const FormContainer = styled(Box)({
 });
 
 interface TransactionFormProps {
-    newTransaction: Transaction;
+    newTransaction: TransactionToSubmit;
     users: User[];
-    activeUser?: User;
     currencies: { value: string; label: string }[];
     onInputChange: (field: string) => (event: ChangeEvent<HTMLInputElement>) => void;
     onSubmit: () => void;
@@ -20,7 +21,6 @@ interface TransactionFormProps {
 const TransactionForm: React.FC<TransactionFormProps> = ({
     newTransaction,
     users,
-    activeUser,
     currencies,
     onInputChange,
     onSubmit
@@ -48,21 +48,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                         </MenuItem>
                     ))}
                 </TextField>
-                {!activeUser && (
-                    <TextField
-                        onChange={onInputChange('sender_id')}
-                        value={newTransaction.sender_id}
-                        select
-                        size="small"
-                        helperText="Sender"
-                    >
-                        {users.map(user => (
-                            <MenuItem key={user.id} value={user.id}>
-                                {user.name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                )}
                 <TextField
                     onChange={onInputChange('receiver_id')}
                     value={newTransaction.receiver_id}

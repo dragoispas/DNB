@@ -1,34 +1,18 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField } from '@mui/material';
-import { login } from '../api';
+import { useAuth } from '../hooks/useAuth';
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault();
         setError('');
 
-        try {
-            const response = await login({ email, password })
-            if (response.success) {
-                // Store the authentication token (if provided)
-                if (response.token) {
-                    localStorage.setItem('authToken', response.token);
-                }
-                console.log('Logged in with:', email, password);
-                navigate('/profile'); // Navigate to profile page on successful login
-            } else {
-                setError(response.message || 'Invalid email or password.');
-            }
-        } catch (err) {
-            setError('Invalid email or password.');
-            console.error('Login failed:', err);
-        }
+        await login({ email, password });
     };
 
     return (

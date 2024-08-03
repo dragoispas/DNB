@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField } from '@mui/material';
-import { register } from '../api';
+import { register } from '../api/auth';
+import { useAuth } from '../hooks/useAuth';
 
 const RegisterForm: React.FC = () => {
     const [name, setName] = useState('');
@@ -10,20 +11,13 @@ const RegisterForm: React.FC = () => {
     const [birthDate, setBirthDate] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate();
+    const { register } = useAuth();
 
     const handleRegister = async (event: React.FormEvent) => {
         event.preventDefault();
         setError('');
 
-        try {
-            await register({ name, gender, email, birth_date: birthDate, password });
-            console.log('Registered with:', name, gender, email, birthDate);
-            navigate('/profile'); // Navigate to profile page on successful registration
-        } catch (err) {
-            setError('Registration failed. Please check your inputs.');
-            console.error('Registration failed:', err);
-        }
+        await register({ name, gender, email, birth_date: birthDate, password });
     };
 
     return (
