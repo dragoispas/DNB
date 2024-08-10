@@ -1,26 +1,12 @@
-import React, { useEffect, ChangeEvent } from 'react';
-import { Box, styled, Typography } from '@mui/material';
-import TransactionForm from '../components/TransactionForm';
+import React, { useEffect } from 'react';
+import { Box, styled, Typography, Button } from '@mui/material';
 import UserAvatar from '../components/UserAvatar';
 import UserTransactionsTable from '../components/UserTransactionsTable';
 import { useAuth } from '../hooks/useAuth';
 import { useTransactions } from '../hooks/useTransactions';
 import { useUsers } from '../hooks/useUsers';
-
-const currencies = [
-    { value: 'USD', label: '$' },
-    { value: 'EUR', label: '€' },
-    { value: 'BTC', label: '฿' },
-    { value: 'JPY', label: '¥' },
-];
-
-const defaultTransaction = {
-    amount: 0,
-    currency: 'EUR',
-    date_time: '',
-    sender_id: 0,
-    receiver_id: 1
-};
+import TransactionDialog from '../components/TransactionDialog';
+import { useTransaction } from '../hooks/useTransaction';
 
 const Container = styled(Box)({
     display: "flex",
@@ -30,15 +16,12 @@ const Container = styled(Box)({
 });
 
 const Transactions: React.FC = () => {
-    // Accessing state from Redux store
-    const { transactions, transactionsCount, currentPage, transactionsPerPage, getTransactions, addTransaction, setCurrentPage, setTransactionsPerPage } = useTransactions({})
+    const { transactions, transactionsCount, currentPage, transactionsPerPage, getTransactions, setCurrentPage, setTransactionsPerPage } = useTransactions({});
     const { profile, getProfile } = useAuth();
     const { users, getUsers } = useUsers();
-
-    const [newTransaction, setNewTransaction] = React.useState(defaultTransaction);
+    const { newTransaction, open, handleInputChange, submitForm, handleClickOpen, handleClose } = useTransaction();
 
     useEffect(() => {
-        console.log(Object.keys(transactions).length);
         if (!profile) getProfile();
         if (Object.keys(users).length === 0) getUsers();
         if (Object.keys(transactions).length === 0) getTransactions();
@@ -46,35 +29,14 @@ const Transactions: React.FC = () => {
 
     if (!profile) return null;
 
-    const handleInputChange = (field: string) => (event: ChangeEvent<HTMLInputElement>) => {
-        setNewTransaction(prevState => ({
-            ...prevState,
-            [field]: event.target.value
-        }));
-    };
-
-    const submitForm = async () => {
-        try {
-            const transactionToSubmit = { ...newTransaction, sender_id: profile.id, date_time: new Date().toISOString() };
-            await addTransaction(transactionToSubmit);
-            await getTransactions();
-        } catch (error) { }
-    };
-
     const handlePageChange = (event: unknown, newPage: number) => {
         setCurrentPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (
-        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    ) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setTransactionsPerPage(parseInt(event.target.value, 10));
         setCurrentPage(1);
     };
-
-    if (!profile) {
-        return null;
-    }
 
     return (
         <Container>
@@ -90,12 +52,16 @@ const Transactions: React.FC = () => {
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
             {profile && <Typography>{`Account Balance: ${profile.balance} EUR`}</Typography>}
-            <TransactionForm
+            <Button variant="contained" color="primary" onClick={handleClickOpen}>
+                New Transaction
+            </Button>
+            <TransactionDialog
+                open={open}
+                onClose={handleClose}
+                onSubmit={submitForm}
                 newTransaction={newTransaction}
                 users={Object.values(users)}
-                currencies={currencies}
                 onInputChange={handleInputChange}
-                onSubmit={submitForm}
             />
         </Container>
     );

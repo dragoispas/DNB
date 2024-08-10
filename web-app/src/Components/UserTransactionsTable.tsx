@@ -20,9 +20,9 @@ const UserTransactionsTable: React.FC<Props> = ({
     transactions,
     userId,
     currentPage = 1,
-    totalPages,
-    totalItems,
-    rowsPerPage,
+    totalPages = 1,
+    totalItems = 0,
+    rowsPerPage = 10,
     onPageChange,
     onRowsPerPageChange,
 }) => {
