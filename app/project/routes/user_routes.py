@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
-from sqlalchemy import case, func
+from sqlalchemy import case, func, or_
 from project.models import Transaction, db, User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -27,6 +27,57 @@ def get_user(user_id):
         "id": user.id,
         "name": user.name,
     }
+    return jsonify(result)
+
+
+@user_bp.route("/knownusers", methods=["GET"])
+@jwt_required()
+def get_known_users():
+    # Get the JWT identity
+    current_user_identity = get_jwt_identity()
+
+    # Ensure that the identity is a dictionary and extract the email
+    if isinstance(current_user_identity, dict):
+        user_email = current_user_identity.get("email")
+    else:
+        user_email = current_user_identity
+
+    # Retrieve the user object using the identity
+    user = User.query.filter_by(email=user_email).first()
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Query for users that the logged-in user has transactions with, excluding the user themselves
+    known_users = (
+        db.session.query(User)
+        .join(
+            Transaction,
+            or_(
+                Transaction.sender_id == user.id,
+                Transaction.receiver_id == user.id,
+            ),
+        )
+        .filter(
+            or_(
+                User.id == Transaction.sender_id,
+                User.id == Transaction.receiver_id,
+            ),
+            User.id != user.id,  # Exclude the logged-in user
+        )
+        .distinct()
+        .all()
+    )
+
+    # Format the result
+    result = [
+        {
+            "id": known_user.id,
+            "name": known_user.name,
+        }
+        for known_user in known_users
+    ]
+
     return jsonify(result)
 
 

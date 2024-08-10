@@ -1,18 +1,16 @@
 import React, { ChangeEvent } from 'react';
-import { TextField, MenuItem, Button, Box, styled } from '@mui/material';
-import { Profile } from '../api/auth';
+import { TextField, MenuItem, Button, Box, styled, Typography } from '@mui/material';
 import { User } from '../api/users';
 import { TransactionToSubmit } from '../api/transactions/types';
 
 const FormContainer = styled(Box)({
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
 });
 
 interface TransactionFormProps {
     newTransaction: TransactionToSubmit;
-    users: User[];
+    recipient: User;
     currencies: { value: string; label: string }[];
     onInputChange: (field: string) => (event: ChangeEvent<HTMLInputElement>) => void;
     onSubmit: () => void;
@@ -20,13 +18,13 @@ interface TransactionFormProps {
 
 const TransactionForm: React.FC<TransactionFormProps> = ({
     newTransaction,
-    users,
+    recipient,
     currencies,
     onInputChange,
     onSubmit
 }) => {
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", width: 400, gap: 1 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <FormContainer>
                 <TextField
                     onChange={onInputChange('amount')}
@@ -48,22 +46,18 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                         </MenuItem>
                     ))}
                 </TextField>
-                <TextField
-                    onChange={onInputChange('receiver_id')}
-                    value={newTransaction.receiver_id}
-                    select
-                    size="small"
-                    helperText="Receiver"
-                >
-                    {users.map(user => (
-                        <MenuItem key={user.id} value={user.id}>
-                            {user.name}
-                        </MenuItem>
-                    ))}
-                </TextField>
-
             </FormContainer>
-            <Button onClick={onSubmit} variant="contained">Submit</Button>
+            <Box>
+                <Typography variant="body2" color="textSecondary">
+                    Recipient ID: {recipient.id}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                    Recipient Name: {recipient.name}
+                </Typography>
+            </Box>
+            <Button onClick={onSubmit} variant="contained">
+                Submit
+            </Button>
         </Box>
     );
 };
