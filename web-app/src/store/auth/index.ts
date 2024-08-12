@@ -1,3 +1,3 @@
-export * from './slice'
-export * from './actions'
-export type { ProfileState } from './types'
+export * from "./actions";
+export * from "./types";
+export * from "./slice";

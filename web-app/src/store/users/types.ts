@@ -1,10 +1,10 @@
 import { User } from "../../api/users";
 
 export type UsersMap = {
-    [id: number]: User
-}
+  [id: number]: User;
+};
 
 export interface UsersState {
-    userIds: number[];
-    usersMap: UsersMap;
+  userIds: number[];
+  usersMap: UsersMap;
 }

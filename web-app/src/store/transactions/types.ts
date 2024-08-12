@@ -1,16 +1,15 @@
-import { Transaction } from "../../api/transactions";
-import { TransactionToSubmit } from "../../api/transactions/types";
+import { Transaction, TransactionToSubmit } from "../../api/transactions";
 
 export type TransactionsMap = {
-    [id: number]: Transaction
-}
+  [id: number]: Transaction;
+};
 
 export interface TransactionState {
-    transactionsIds: number[];
-    transactionsMap: TransactionsMap;
-    page: number;
-    totalPages: number;
-    totalItems: number;
-    itemsPerPage: number;
-    transactionToSubmit: TransactionToSubmit
+  transactionsIds: number[];
+  transactionsMap: TransactionsMap;
+  page: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  transactionToSubmit: TransactionToSubmit;
 }
