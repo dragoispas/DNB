@@ -8,13 +8,15 @@ import {
   logoutUser,
   registerUser,
 } from "../store/auth";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const profile = useSelector((state: RootState) => state.profile.profile);
   const isAuthenticated = useRef(localStorage.getItem("authToken") !== null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -37,10 +39,14 @@ export const useAuth = () => {
   }, [isAuthenticated]);
 
   const getProfile = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
       await dispatch(fetchProfile());
     } catch (error) {
-      console.error("Failed to fetch profile:", error);
+      setError("Failed to fetch profile");
+    } finally {
+      setLoading(false);
     }
   }, [dispatch]);
 

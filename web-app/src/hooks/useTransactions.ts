@@ -32,10 +32,6 @@ export const useTransactions = ({ lazy = false }: Props = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    getTransactions();
-  }, [currentPage, transactionsPerPage]);
-
   const getTransactions = useCallback(async () => {
     setLoading(true);
     setError(null);

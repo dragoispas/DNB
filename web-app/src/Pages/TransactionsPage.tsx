@@ -24,6 +24,7 @@ const Transactions: React.FC = () => {
     getTransactions,
     setCurrentPage,
     setTransactionsPerPage,
+    loading,
   } = useTransactions({});
   const { profile, getProfile } = useAuth();
   const { users, getUsers } = useUsers();
@@ -37,10 +38,17 @@ const Transactions: React.FC = () => {
   } = useTransaction();
 
   useEffect(() => {
+    console.log("Effect");
     if (!profile) getProfile();
     if (Object.keys(users).length === 0) getUsers();
-    if (Object.keys(transactions).length === 0) getTransactions();
+    if (Object.keys(transactions).length === 0 && !loading) getTransactions();
   }, []);
+
+  useEffect(() => {
+    if (!loading && profile) {
+      getTransactions();
+    }
+  }, [currentPage, transactionsPerPage]);
 
   if (!profile) return null;
 
