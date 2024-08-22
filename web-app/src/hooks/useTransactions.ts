@@ -2,13 +2,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store/store";
 import { useAuth } from "./useAuth";
 import { useCallback, useEffect, useState } from "react";
-import {
-  createTransaction,
-  fetchTransactionsByUser,
-  setItemsPerPage,
-  setPage,
-} from "../store/transactions";
+import { createTransaction, fetchTransactions } from "../store/transactions";
 import { TransactionToSubmit } from "../api/transactions/types";
+import { setPage, setItemsPerPage } from "../store/transactions/slice";
 
 interface Props {
   lazy?: boolean;
@@ -29,32 +25,32 @@ export const useTransactions = ({ lazy = false }: Props = {}) => {
   const transactionsPerPage = useSelector(
     (state: RootState) => state.transactions.itemsPerPage
   );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const loading = useSelector(
+    (state: RootState) => state.transactions.loadingTransactions
+  );
+  const error = useSelector(
+    (state: RootState) => state.transactions.fetchTransactionsError
+  );
 
   const getTransactions = useCallback(async () => {
-    setLoading(true);
-    setError(null);
     try {
-      await dispatch(
-        fetchTransactionsByUser(currentPage + 1, transactionsPerPage)
+      dispatch(
+        fetchTransactions({
+          page: currentPage + 1,
+          itemsPerPage: transactionsPerPage,
+        })
       );
     } catch (error) {
-      setError("Failed to fetch transactions");
     } finally {
-      setLoading(false);
     }
   }, [dispatch, profile, currentPage, transactionsPerPage]);
 
   const addTransaction = useCallback(
     async (transaction: TransactionToSubmit) => {
       try {
-        setLoading(true);
         await dispatch(createTransaction(transaction));
       } catch (error) {
-        setError("Failed to add transaction");
       } finally {
-        setLoading(false);
         getTransactions();
       }
     },

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   web:
@@ -25,18 +25,18 @@ services:
       - POSTGRES_DB=dnb_db
     ports:
       - "5432:5432"
-  # frontend:
-  #   build:
-  #     context: ./web-app
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./web-app:/usr/src/app
-  #   environment:
-  #     - CHOKIDAR_USEPOLLING=true
-  #   depends_on:
-  #     - web
+  frontend:
+    build:
+      context: ./web-app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web-app:/usr/src/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - web
 
 volumes:
   postgres_data:

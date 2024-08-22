@@ -38,7 +38,6 @@ const Transactions: React.FC = () => {
   } = useTransaction();
 
   useEffect(() => {
-    console.log("Effect");
     if (!profile) getProfile();
     if (Object.keys(users).length === 0) getUsers();
     if (Object.keys(transactions).length === 0 && !loading) getTransactions();

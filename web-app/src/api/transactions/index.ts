@@ -1,8 +1,4 @@
-export {
-  getTransactions,
-  getTransactionsByUserId,
-  addTransaction,
-} from "./api";
+export { transactionsApi } from "./api";
 export type {
   Transaction,
   TransactionsResponse,

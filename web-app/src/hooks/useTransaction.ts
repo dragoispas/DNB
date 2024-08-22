@@ -5,9 +5,9 @@ import { useAuth } from "./useAuth";
 import React from "react";
 import { RootState } from "../store/store";
 import {
-  resetNewTransaction,
   updateNewTransactionField,
-} from "../store/transactions";
+  resetNewTransaction,
+} from "../store/transactions/slice";
 
 export const useTransaction = () => {
   const dispatch = useDispatch();
@@ -36,11 +36,11 @@ export const useTransaction = () => {
         date_time: new Date().toISOString(),
       };
       await addTransaction(transactionToSubmit);
-      await getTransactions();
-      setOpen(false); // Close the dialog on form submission
-      dispatch(resetNewTransaction());
+      setOpen(false);
     } catch (error) {
       console.error("Failed to submit transaction", error);
+    } finally {
+      await getTransactions();
     }
   };
 

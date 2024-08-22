@@ -12,4 +12,10 @@ export interface TransactionState {
   totalItems: number;
   itemsPerPage: number;
   transactionToSubmit: TransactionToSubmit;
+  loadingTransactions: boolean;
+  fetchTransactionsError: string | null;
+  creatingTransaction: boolean;
+  createTransactionError: string | null;
 }
+
+export enum TransactionActions {}

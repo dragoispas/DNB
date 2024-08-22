@@ -1,36 +1,47 @@
-import {
-  TransactionsResponse,
-  getTransactionsByUserId,
-  TransactionToSubmit,
-  addTransaction,
-} from "../../api/transactions";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { transactionsApi, TransactionToSubmit } from "../../api/transactions";
 import { AppDispatch } from "../store";
-import {
-  setTransactions,
-  setTotalItems,
-  setTotalPages,
-  updateNewTransactionField,
-} from "./slice";
+import { updateNewTransactionField } from "./slice";
 
-export const fetchTransactionsByUser =
-  (page: number, itemsPerPage: number) => async (dispatch: AppDispatch) => {
+export const fetchTransactions = createAsyncThunk(
+  "transactions/fetchTransactions",
+  async (
+    payload: { page: number; itemsPerPage: number },
+    { rejectWithValue }
+  ) => {
     try {
-      const response: TransactionsResponse | null =
-        await getTransactionsByUserId(page, itemsPerPage);
-      if (response) {
-        dispatch(setTransactions(response.transactions));
-        dispatch(setTotalItems(response.total_items));
-        dispatch(setTotalPages(response.total_pages));
+      const response = await transactionsApi.fetchTransactions(
+        payload.page,
+        payload.itemsPerPage
+      );
+      return response;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
       }
-    } catch (error) {}
-  };
 
-export const createTransaction =
-  (transaction: TransactionToSubmit) => async (dispatch: AppDispatch) => {
+      throw error;
+    }
+  }
+);
+
+export const createTransaction = createAsyncThunk(
+  "transactions/createTransaction", // Define a unique action type
+  async (transaction: TransactionToSubmit, { rejectWithValue }) => {
     try {
-      await addTransaction(transaction);
-    } catch (error) {}
-  };
+      const newTransaction = await transactionsApi.createTransaction(
+        transaction
+      );
+      // Optionally, you can return the newly created transaction data here if needed
+      return newTransaction;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      throw error;
+    }
+  }
+);
 
 export const editNewTransactionField =
   (field: string, value: any) => (dispatch: AppDispatch) => {
